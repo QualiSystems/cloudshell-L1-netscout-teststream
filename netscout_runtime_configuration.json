@@ -1,0 +1,10 @@
+{
+  "common_variable": {
+    "connection_port": 53058,
+    "device_prompt": "=>",
+    "force_duplex": true,
+    "connection_mode": "DUPLEX_TAP",
+    "standalone_tap": false,
+    "switch_name": "OS-192"
+  }
+}

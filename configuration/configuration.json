@@ -1,0 +1,42 @@
+{
+  "common_variable": {
+    "driver_name": "NetScout",
+    "driver_module": ["netscout.driver_handler", "NetscoutDriverHandler"],
+    "connection_type": "tcp",
+    "connection_port": 53058,
+    "device_prompt": "=>",
+    "server_timeout": 10,
+    "runtime_configuration": "netscout_runtime_configuration.json",
+    "force_duplex": true,
+    "connection_mode": "DUPLEX_TAP",
+    "standalone_tap": false,
+    "switch_name": "OS-192"
+  },
+
+  "cli_variable": {
+    "ssh": ["common.cli.ssh_session", "SSHSession"],
+    "telnet": ["common.cli.telnet_session", "TelnetSession"],
+    "tcp": ["common.cli.tcp_session", "TCPSession"]
+  },
+
+  "driver_variable": {
+    "resource_name": [
+      "Switch {0}",
+      "Chassis {0}",
+      "Blade {0}",
+      "Port {0}"
+    ],
+    "resource_family_name": [
+      "L1 Connectivity Switch",
+      "L1 Chassis",
+      "L1 Blade",
+      "L1 Switch Port"
+    ],
+    "resource_model_name": [
+      "{0}",
+      "Chassis {0}",
+      "Blade {0}",
+      "Port {0}"
+    ]
+  }
+}

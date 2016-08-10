@@ -1,0 +1,3 @@
+cloudshell-core==2.1.153
+# -e git+git@github.com:QualiSystems/cloudshell-L1-networking-core.git#egg=cloudshell_l1_networking_core
+

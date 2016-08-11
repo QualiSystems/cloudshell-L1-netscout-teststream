@@ -11,8 +11,7 @@ from netscout.request_handler import NetscoutRequestHandler
 
 
 SERVER_HOST = '0.0.0.0'
-# SERVER_PORT = 1024
-SERVER_PORT = 8888
+SERVER_PORT = 1024
 
 
 if __name__ == '__main__':

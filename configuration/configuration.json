@@ -27,15 +27,15 @@
       "Port {0}"
     ],
     "resource_family_name": [
-      "L1 Connectivity Switch",
-      "L1 Chassis",
-      "L1 Blade",
-      "L1 Switch Port"
+      "L1 Optical Switch",
+      "L1 Optical Switch Chassis Controller",
+      "L1 Optical Switch Blade",
+      "L1 Optical Switch Port"
     ],
     "resource_model_name": [
       "{0}",
-      "Chassis {0}",
-      "Blade {0}",
+      "NetScout Switch 3900 Chassis Controller",
+      "{0}",
       "Port {0}"
     ]
   }

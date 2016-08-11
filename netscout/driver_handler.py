@@ -44,8 +44,16 @@ class NetscoutDriverHandler(DriverHandlerBase):
             r"SWITCH COMPONENTS(?P<switch_components>.*)",
             device_info, re.DOTALL)
 
-        model_name = re.search(r"Switch Model:[ ]?(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
+        model_name = re.search(r"Switch Model:[ ]*(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
         resource_info.set_model_name(model_name)
+        resource_info.set_index(model_name)
+        ip_addr = re.search(r"IP Address:[ ]*(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
+        resource_info.add_attribute("Switch Address", ip_addr)
+
+        command = "display status".format(self.switch_name)
+        device_status = self._session.send_command(command, re_string=self._prompt)
+        soft_version = re.search(r"Version[ ]?(.*?)\n", device_status, re.DOTALL).group(1)
+        resource_info.add_attribute("Software Version", soft_version)
 
         info_list = info_match.group("switch_components").split("\n")
 
@@ -83,11 +91,9 @@ class NetscoutDriverHandler(DriverHandlerBase):
                 blade_info = re.search(
                     r"(?P<vendor>.*),(?P<model>.*),(?P<uboot_rev>.*),(?P<serial_number>.*)", info_str, re.DOTALL)
 
-                chassis_resource.set_model_name(blade_info.group("model"))
-                blade_resource.add_attribute("Vendor", blade_info.group("vendor"))
-                blade_resource.add_attribute("Uboot Rev.", blade_info.group("uboot_rev"))
+                # blade_resource.add_attribute("Vendor", blade_info.group("vendor"))
+                # blade_resource.add_attribute("Uboot Rev.", blade_info.group("uboot_rev"))
                 blade_resource.set_serial_number(blade_info.group("serial_number"))
-                blade_resource.set_model_name(blade_info.group("model"))
 
                 chassis_ports = all_ports.get(chassis_no, {})
                 blade_ports = chassis_ports.get(blade_no, [])
@@ -95,20 +101,24 @@ class NetscoutDriverHandler(DriverHandlerBase):
                 for port_data in blade_ports:
                     port_no = int(port_data["phys_addr"].split(".")[-1])
                     port_resource = ResourceInfo()
+                    port_resource.set_model_name(blade_type)
                     port_resource.set_depth(depth + 3)
                     port_resource.set_index(str(port_no))
                     port_resource.add_attribute("Protocol Type", 0)
 
-                    if port_data["status"].lower() == "not connected":
-                        port_resource.add_attribute("State", "Enable")
-                    else:
-                        port_resource.add_attribute("State", "Disable")
-
+                    # if port_data["status"].lower() == "not connected":
+                    #     port_resource.add_attribute("State", "Enable")
+                    # else:
+                    #     port_resource.add_attribute("State", "Disable")
                     blade_resource.add_child(port_no, port_resource)
 
             elif info_str.startswith(" " * 2):
+                # blade type is the last word in the sequence
+                blade_type = info_str.rstrip().rsplit(' ')[-1]
                 blade_no = int(re.search(r"(\d+)", info_str).group(1))
+
                 blade_resource = ResourceInfo()
+                blade_resource.set_model_name(blade_type)
                 blade_resource.set_depth(depth + 2)
                 blade_resource.set_index(str(blade_no))
                 chassis_resource.add_child(info_str, blade_resource)

@@ -296,7 +296,7 @@
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="G-Blade" Description="NetScout O-Blade" SupportsConcurrentCommands="false">
+        <ResourceModel Name="G-Blade" Description="NetScout G-Blade" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>

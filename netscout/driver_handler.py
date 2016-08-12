@@ -22,13 +22,6 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = 'logoff'
         self._session.send_command(command, re_string='is now logged off')
 
-    def _select_switch(self, command_logger=None):
-        command = 'select switch {}'.format(self.switch_name)
-        self._session.send_command(command, re_string='has been selected')
-
-    def _get_device_data(self):
-        pass
-
     def get_resource_description(self, address, command_logger=None):
         # todo: handle incoming MAP
         depth = 0
@@ -125,41 +118,81 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
         return resource_info.convert_to_xml()
 
-    def _map_bidi_duplex(self, src_port, dst_port):
-        command = "connect duplex prtn {} to {} force".format(src_port, dst_port)
-        return self._session.send_command(command, re_string="successful")
-
-    def _map_bidi_multicast(self, src_port, dst_port, command_logger):
-        command = "con multi {} to {} for"
-        src_cmd = command.format(src_port, dst_port)
-        dst_cmd = command.format(dst_port, src_port)
-
-        for cmd in (src_cmd, dst_cmd):
-            self._session.send_command(cmd, re_string=self._prompt)
-
     def _convert_port_names(self, src_port, dst_port):
         return [
             '.'.join(map(lambda x: x.zfill(2), port[1:]))
             for port in (src_port, dst_port)]
+
+    def _select_switch(self, command_logger=None):
+        command = 'select switch {}'.format(self.switch_name)
+        self._session.send_command(command, re_string='has been selected')
+
+    def _con_simplex(self, src_port, dst_port, command_logger=None):
+        command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
+        error_map = {
+            "not found": "Source or destination port number is invalid"
+        }
+        # todo(A.Piddubny): clarify this behavior
+        return self._session.send_command(command, re_string="successful|not found", error_map=error_map)
+
+    def _con_duplex(self, src_port, dst_port, command_logger=None):
+        command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
+        return self._session.send_command(command, re_string="successful")
+
+    def _con_multicast(self, src_port, dst_port, command_logger=None):
+        command = "connect multicast prtnum {} to {} force".format(src_port, dst_port)
+        return self._session.send_command(command, re_string="successful")
+
+    def _discon_simplex(self, src_port, dst_port, command_logger=None):
+        command = "disconnect simplex {} force".format(dst_port)
+        return self._session.send_command(command, re_string="successful")
+
+    def _discon_duplex(self, src_port, dst_port, command_logger=None):
+        command = "disconnect duplex prtnum {} force".format(src_port)
+        return self._session.send_command(command, re_string="successful")
+
+    def _discon_multicast(self, src_port, dst_port, command_logger=None):
+        command = "disconnect multicast destination prtnum {} force".format(dst_port)
+        return self._session.send_command(command, re_string="successful")
 
     def map_bidi(self, src_port, dst_port, command_logger):
         self._select_switch(command_logger=command_logger)
         src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
 
         if self.force_duplex or self.connection_mode == "DUPLEX_TAP":
-            self._map_bidi_duplex(src_port_name, dst_port_name)
+            self._con_duplex(src_port_name, dst_port_name, command_logger)
 
         elif self.connection_mode == "MULTICAST":
-            self._map_bidi_multicast(src_port_name, dst_port_name)
-
-    def map_clear_to(self, src_port, dst_port, command_logger):
-        pass
-
-    def map_clear(self, src_port, dst_port, command_logger):
-        pass
+            self._con_multicast(src_port_name, dst_port_name, command_logger)
+            self._con_multicast(dst_port_name, src_port_name, command_logger)
 
     def map_uni(self, src_port, dst_port, command_logger):
-        pass
+        self._select_switch(command_logger=command_logger)
+        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
+
+        if self.connection_mode == "MULTICAST":
+            self._con_multicast(src_port_name, dst_port_name, command_logger)
+        else:
+            self._con_simplex(src_port_name, dst_port_name, command_logger)
 
     def set_speed_manual(self, command_logger):
         command_logger.info("EXECUTE 'set_speed_manual' command")
+
+    def map_clear_to(self, src_port, dst_port, command_logger):
+        self._select_switch(command_logger=command_logger)
+        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
+
+        if self.connection_mode == "MULTICAST":
+            self._discon_multicast(src_port_name, dst_port_name, command_logger)
+        else:
+            self._discon_simplex(src_port_name, dst_port_name, command_logger)
+
+    def map_clear(self, src_port, dst_port, command_logger):
+        self._select_switch(command_logger=command_logger)
+        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
+
+        if self.connection_mode == "MULTICAST":
+            self._discon_multicast(src_port_name, dst_port_name, command_logger)
+            self._discon_multicast(dst_port_name, src_port_name, command_logger)
+        else:
+            self._discon_duplex(src_port_name, dst_port_name, command_logger)

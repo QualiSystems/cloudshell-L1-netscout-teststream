@@ -35,6 +35,7 @@ if __name__ == '__main__':
     request_manager.bind_command('setstateid', (NetscoutRequestHandler.set_state_id, request_handler))
     request_manager.bind_command('getstateid', (NetscoutRequestHandler.get_state_id, request_handler))
     request_manager.bind_command('mapbidi', (NetscoutRequestHandler.map_bidi, request_handler))
+    request_manager.bind_command('mapuni', (NetscoutRequestHandler.map_uni, request_handler))
     request_manager.bind_command('mapclearto', (NetscoutRequestHandler.map_clear_to, request_handler))
     request_manager.bind_command('mapclear', (NetscoutRequestHandler.map_clear, request_handler))
 

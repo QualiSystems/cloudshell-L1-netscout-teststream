@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <ResourceManagementExportImport xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.qualisystems.com/ResourceManagement/ExportImportConfigurationSchema.xsd">
   <Tags>
     <Tag Name="Available For Abstract Resources" />
@@ -9,43 +9,6 @@
     <Tag Name="Variable Capability" />
   </Tags>
   <Attributes>
-    <AttributeInfo Name="Alarm State" Type="String" DefaultValue="" IsReadOnly="true" IsCommand="true">
-      <Tags>
-        <TagName Name="Setting" />
-        <TagName Name="Available For Abstract Resources" />
-      </Tags>
-    </AttributeInfo>
-    <AttributeInfo Name="Link Capacity" Type="String" DefaultValue="" IsReadOnly="true" IsCommand="true">
-      <Tags>
-        <TagName Name="Setting" />
-        <TagName Name="Available For Abstract Resources" />
-      </Tags>
-    </AttributeInfo>
-    <AttributeInfo Name="Port Flapping" Type="String" DefaultValue="" IsReadOnly="false" IsCommand="true">
-      <Tags>
-        <TagName Name="Setting" />
-        <TagName Name="Available For Abstract Resources" />
-        <TagName Name="Link Configurations" />
-      </Tags>
-    </AttributeInfo>
-    <AttributeInfo Name="Port Name" Type="String" DefaultValue="" IsReadOnly="true" IsCommand="true">
-      <Tags>
-        <TagName Name="Setting" />
-        <TagName Name="Available For Abstract Resources" />
-      </Tags>
-    </AttributeInfo>
-    <AttributeInfo Name="Software Version" Type="String" DefaultValue="" IsReadOnly="true" IsCommand="true">
-      <Tags>
-        <TagName Name="Setting" />
-        <TagName Name="Available For Abstract Resources" />
-      </Tags>
-    </AttributeInfo>
-    <AttributeInfo Name="Switch Address" Type="String" DefaultValue="" IsReadOnly="true" IsCommand="true">
-      <Tags>
-        <TagName Name="Setting" />
-        <TagName Name="Available For Abstract Resources" />
-      </Tags>
-    </AttributeInfo>
     <AttributeInfo Name="Auto Negotiation" Type="Boolean" DefaultValue="True" IsReadOnly="false" IsCommand="true">
       <Tags>
         <TagName Name="Setting" />
@@ -178,6 +141,8 @@
         <LookupValue NumericValue="5" StringValue="Infiniband" />
         <LookupValue NumericValue="6" StringValue="T-Carrier" />
         <LookupValue NumericValue="7" StringValue="E-Carrier" />
+        <LookupValue NumericValue="8" StringValue="40G Ethernet" />
+        <LookupValue NumericValue="9" StringValue="100G Ethernet" />
       </LookupValues>
     </AttributeInfo>
     <AttributeInfo xsi:type="LookupAttributeDetails" Name="Speed" Type="Lookup" DefaultValue="2" IsReadOnly="false" IsCommand="true">
@@ -231,7 +196,7 @@
     </Module>
   </Modules>
   <ResourceFamilies>
-    <ResourceFamily Name="L1 Optical Switch" IsMappableContainer="true" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" SupportsMulticastMapping="true" SupportsLoopbackMapping="true" IsPowerSwitch="false" IsConsoleServer="false">
+    <ResourceFamily Name="L1 Optical Switch" IsMappableContainer="true" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="true" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes>
         <AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
           <AllowedValues />
@@ -241,32 +206,56 @@
         </AttachedAttribute>
       </AttachedAttributes>
       <AttributeValues>
-        <AttributeValue Name="Password" Value="" />
         <AttributeValue Name="User" Value="" />
+        <AttributeValue Name="Password" Value="" />
       </AttributeValues>
       <Models>
-        <ResourceModel Name="OS-192" Description="NetScout Switch 3900 OS-192" SupportsConcurrentCommands="false">
-          <AttachedAttributes>
-            <AttachedAttribute Name="Software Version" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Switch Address" IsOverridable="true" IsLocal="true">
-              <AllowedValues />
-            </AttachedAttribute>
-          </AttachedAttributes>
-          <AttributeValues />
+        <ResourceModel Name="OS-192" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="User" Value="" />
+            <AttributeValue Name="Password" Value="" />
+          </AttributeValues>
           <ParentModels />
           <Drivers>
-            <DriverName>NetScout 3900</DriverName>
+            <DriverName>NetScout 3900 Driver</DriverName>
           </Drivers>
         </ResourceModel>
       </Models>
     </ResourceFamily>
-    <ResourceFamily Name="L1 Optical Switch Chassis Controller" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false">
+    <ResourceFamily Name="L1 Optical Switch Port" IsMappableContainer="false" IsMappable="true" IsConnectable="true" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="true" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="NetScout Switch 3900 Chassis Controller" Description="NetScout Switch 3900 Chassis Controller" SupportsConcurrentCommands="false">
+        <ResourceModel Name="Port O-Blade" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>2</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>0</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol" Value="2" />
+            <AttributeValue Name="Protocol Type" Value="0" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>O-Blade</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
+      </Models>
+    </ResourceFamily>
+    <ResourceFamily Name="L1 Optical Switch Chassis Controller" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
+      <AttachedAttributes />
+      <AttributeValues />
+      <Models>
+        <ResourceModel Name="NetScout Switch 3900 Chassis Controller" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
@@ -276,130 +265,15 @@
         </ResourceModel>
       </Models>
     </ResourceFamily>
-    <ResourceFamily Name="L1 Optical Switch Blade" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false">
+    <ResourceFamily Name="L1 Optical Switch Blade" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="S-Blade" Description="NetScout S-Blade" SupportsConcurrentCommands="false">
+        <ResourceModel Name="O-Blade" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
             <ParentModelName>NetScout Switch 3900 Chassis Controller</ParentModelName>
-          </ParentModels>
-          <Drivers />
-        </ResourceModel>
-        <ResourceModel Name="O-Blade" Description="NetScout O-Blade" SupportsConcurrentCommands="false">
-          <AttachedAttributes />
-          <AttributeValues />
-          <ParentModels>
-            <ParentModelName>NetScout Switch 3900 Chassis Controller</ParentModelName>
-          </ParentModels>
-          <Drivers />
-        </ResourceModel>
-        <ResourceModel Name="G-Blade" Description="NetScout G-Blade" SupportsConcurrentCommands="false">
-          <AttachedAttributes />
-          <AttributeValues />
-          <ParentModels>
-            <ParentModelName>NetScout Switch 3900 Chassis Controller</ParentModelName>
-          </ParentModels>
-          <Drivers />
-        </ResourceModel>
-      </Models>
-    </ResourceFamily>
-    <ResourceFamily Name="L1 Optical Switch Port" IsMappableContainer="false" IsMappable="true" IsConnectable="true" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="true" AcceptsMultipleConnections="false" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false">
-      <AttachedAttributes />
-      <AttributeValues />
-      <Models>
-        <ResourceModel Name="Port S-Blade" Description="NetScout S-Blade port" SupportsConcurrentCommands="false">
-          <AttachedAttributes>
-            <AttachedAttribute Name="Alarm State" IsOverridable="true" IsLocal="false">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Link Capacity" IsOverridable="true" IsLocal="false">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
-              <AllowedValues>
-                <AllowedValue>10</AllowedValue>
-                <AllowedValue>12</AllowedValue>
-                <AllowedValue>38</AllowedValue>
-                <AllowedValue>39</AllowedValue>
-                <AllowedValue>40</AllowedValue>
-                <AllowedValue>41</AllowedValue>
-                <AllowedValue>31</AllowedValue>
-                <AllowedValue>32</AllowedValue>
-                <AllowedValue>34</AllowedValue>
-              </AllowedValues>
-            </AttachedAttribute>
-            <AttachedAttribute Name="Port Name" IsOverridable="true" IsLocal="false">
-              <AllowedValues />
-            </AttachedAttribute>
-            <AttachedAttribute Name="Duplex" IsOverridable="true" IsLocal="false">
-              <AllowedValues>
-                <AllowedValue>3</AllowedValue>
-              </AllowedValues>
-            </AttachedAttribute>
-            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
-              <AllowedValues>
-                <AllowedValue>1</AllowedValue>
-                <AllowedValue>2</AllowedValue>
-                <AllowedValue>3</AllowedValue>
-                <AllowedValue>4</AllowedValue>
-              </AllowedValues>
-            </AttachedAttribute>
-            <AttachedAttribute Name="Speed" IsOverridable="true" IsLocal="false">
-              <AllowedValues>
-                <AllowedValue>4</AllowedValue>
-                <AllowedValue>5</AllowedValue>
-                <AllowedValue>6</AllowedValue>
-                <AllowedValue>11</AllowedValue>
-                <AllowedValue>12</AllowedValue>
-                <AllowedValue>13</AllowedValue>
-                <AllowedValue>14</AllowedValue>
-                <AllowedValue>21</AllowedValue>
-                <AllowedValue>22</AllowedValue>
-              </AllowedValues>
-            </AttachedAttribute>
-            <AttachedAttribute Name="Port Flapping" IsOverridable="true" IsLocal="false">
-              <AllowedValues />
-            </AttachedAttribute>
-          </AttachedAttributes>
-          <AttributeValues>
-            <AttributeValue Name="Alarm State" Value="" />
-            <AttributeValue Name="Link Capacity" Value="" />
-            <AttributeValue Name="Duplex" Value="3" />
-            <AttributeValue Name="Protocol" Value="34" />
-            <AttributeValue Name="Port Name" Value="1" />
-            <AttributeValue Name="Port Flapping" Value="off" />
-            <AttributeValue Name="Protocol Type" Value="1" />
-            <AttributeValue Name="Speed" Value="4" />
-          </AttributeValues>
-          <ParentModels>
-            <ParentModelName>S-Blade</ParentModelName>
-          </ParentModels>
-          <Drivers />
-        </ResourceModel>
-        <ResourceModel Name="Port O-Blade" Description="NetScout O-Blade Port" SupportsConcurrentCommands="false">
-          <AttachedAttributes>
-            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
-              <AllowedValues>
-                <AllowedValue>0</AllowedValue>
-              </AllowedValues>
-            </AttachedAttribute>
-          </AttachedAttributes>
-          <AttributeValues>
-            <AttributeValue Name="Protocol Type" Value="0" />
-          </AttributeValues>
-          <ParentModels>
-            <ParentModelName>O-Blade</ParentModelName>
-          </ParentModels>
-          <Drivers />
-        </ResourceModel>
-        <ResourceModel Name="Port G-Blade" Description="NetScout O-Blade Port" SupportsConcurrentCommands="false">
-          <AttachedAttributes />
-          <AttributeValues />
-          <ParentModels>
-            <ParentModelName>G-Blade</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
@@ -407,6 +281,6 @@
     </ResourceFamily>
   </ResourceFamilies>
   <DriverDescriptors>
-    <DriverDescriptor Name="NetScout 3900" DriverType="L1SwitchDriver" CustomParams="Netscout.exe" />
+    <DriverDescriptor Name="NetScout 3900 Driver" DriverType="L1SwitchTclDriver" CustomParams="Netscout.exe" />
   </DriverDescriptors>
 </ResourceManagementExportImport>

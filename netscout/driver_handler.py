@@ -22,6 +22,18 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = 'logoff'
         self._session.send_command(command, re_string='is now logged off')
 
+    def _disp_switch_info(self, switch_name):
+        command = "display information switch {}".format(switch_name)
+        return self._session.send_command(command, re_string=self._prompt)
+
+    def _disp_status(self):
+        command = "display status"
+        return self._session.send_command(command, re_string=self._prompt)
+
+    def _show_ports_info(self):
+        command = "show port info * swi {}".format(self.switch_name)
+        return self._session.send_command(command, re_string=self._prompt)
+
     def get_resource_description(self, address, command_logger=None):
         # todo: handle incoming MAP
         depth = 0
@@ -29,8 +41,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         resource_info.set_depth(depth)
         resource_info.set_address(address)
 
-        command = "display information switch {}".format(self.switch_name)
-        device_info = self._session.send_command(command, re_string=self._prompt)
+        device_info = self._disp_switch_info(self.switch_name)
 
         info_match = re.search(
             r"PHYSICAL INFORMATION(?P<physical_info>.*)"
@@ -43,15 +54,13 @@ class NetscoutDriverHandler(DriverHandlerBase):
         ip_addr = re.search(r"IP Address:[ ]*(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
         resource_info.add_attribute("Switch Address", ip_addr)
 
-        command = "display status".format(self.switch_name)
-        device_status = self._session.send_command(command, re_string=self._prompt)
+        device_status = self._disp_status()
         soft_version = re.search(r"Version[ ]?(.*?)\n", device_status, re.DOTALL).group(1)
         resource_info.add_attribute("Software Version", soft_version)
 
         info_list = info_match.group("switch_components").split("\n")
 
-        command = "show port info * swi {}".format(self.switch_name)
-        ports_info = self._session.send_command(command, re_string=self._prompt)
+        ports_info = self._show_ports_info(self.switch_name)
 
         ports_list = re.search(r".*-\n(.*)\n\n", ports_info, re.DOTALL).group(1).split("\n")
         all_ports = {}
@@ -129,11 +138,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
     def _con_simplex(self, src_port, dst_port, command_logger=None):
         command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
-        error_map = {
-            "not found": "Source or destination port number is invalid"
-        }
-        # todo(A.Piddubny): clarify this behavior
-        return self._session.send_command(command, re_string="successful|not found", error_map=error_map)
+        return self._session.send_command(command, re_string="successful")
 
     def _con_duplex(self, src_port, dst_port, command_logger=None):
         command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)

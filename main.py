@@ -1,6 +1,6 @@
 import sys
 
-# todo(A.Piddubny): remove this line
+# todo(A.Piddubny): hack to run the server from the CLI
 sys.path.append('../cloudshell-L1-networking-core')
 
 from common.configuration_parser import ConfigurationParser

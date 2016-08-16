@@ -6,12 +6,15 @@ from common.resource_info import ResourceInfo
 
 
 class NetscoutDriverHandler(DriverHandlerBase):
+    TX_SUBPORT_INDEX = 'TX'
+    RX_SUBPORT_INDEX = 'RX'
+
     def __init__(self):
         DriverHandlerBase.__init__(self)
-        self.force_duplex = ConfigurationParser.get("common_variable", "force_duplex")
-        self.connection_mode = ConfigurationParser.get("common_variable", "connection_mode")
-        self.standalone_tap = ConfigurationParser.get("common_variable", "standalone_tap")
-        self.switch_name = ConfigurationParser.get("common_variable", "switch_name")
+        self._port_mode = ConfigurationParser.get("driver_variable", "port_mode")
+
+        # todo(A.Piddubny): find where to get it
+        self.switch_name = "OS-192"
 
     def login(self, address, username, password, command_logger=None):
         self._session.connect(address, username, password, re_string=self._prompt)
@@ -22,6 +25,10 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = 'logoff'
         self._session.send_command(command, re_string='is now logged off')
 
+    @property
+    def is_logical_port_mode(self):
+        return self._port_mode.lower() == "logical"
+
     def _disp_switch_info(self, switch_name):
         command = "display information switch {}".format(switch_name)
         return self._session.send_command(command, re_string=self._prompt)
@@ -30,12 +37,12 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = "display status"
         return self._session.send_command(command, re_string=self._prompt)
 
-    def _show_ports_info(self):
-        command = "show port info * swi {}".format(self.switch_name)
+    def _show_ports_info(self, switch_name):
+        command = "show port info * swi {}".format(switch_name)
         return self._session.send_command(command, re_string=self._prompt)
 
     def get_resource_description(self, address, command_logger=None):
-        # todo: handle incoming MAP
+        # todo(A.Piddubny): handle incoming MAP
         depth = 0
         resource_info = ResourceInfo()
         resource_info.set_depth(depth)
@@ -102,17 +109,29 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
                 for port_data in blade_ports:
                     port_no = int(port_data["phys_addr"].split(".")[-1])
-                    port_resource = ResourceInfo()
-                    port_resource.set_model_name(blade_type)
-                    port_resource.set_depth(depth + 3)
-                    port_resource.set_index(str(port_no))
-                    port_resource.add_attribute("Protocol Type", 0)
 
-                    # if port_data["status"].lower() == "not connected":
-                    #     port_resource.add_attribute("State", "Enable")
-                    # else:
-                    #     port_resource.add_attribute("State", "Disable")
-                    blade_resource.add_child(port_no, port_resource)
+                    if self.is_logical_port_mode:
+                        port_resource = ResourceInfo()
+                        port_resource.set_model_name(blade_type)
+                        port_resource.set_depth(depth + 3)
+                        port_resource.set_index(str(port_no))
+                        port_resource.add_attribute("Protocol Type", 0)
+
+                        # todo(A.Piddubny): will not show simplex connections ! use separate command for this
+                        # if port_data["status"].lower() == "not connected":
+                        #     port_resource.add_attribute("State", "Enable")
+                        # else:
+                        #     port_resource.add_attribute("State", "Disable")
+                        blade_resource.add_child(port_no, port_resource)
+                    else:
+                        for subport in (self.TX_SUBPORT_INDEX, self.RX_SUBPORT_INDEX):
+                            subport_idx = "{}-{}".format(port_no, subport)
+                            subport_resource = ResourceInfo()
+                            subport_resource.set_model_name(blade_type)
+                            subport_resource.set_depth(depth + 3)
+                            subport_resource.set_index(subport_idx)
+                            subport_resource.add_attribute("Protocol Type", 0)
+                            blade_resource.add_child(subport_idx, subport_resource)
 
             elif info_str.startswith(" " * 2):
                 # blade type is the last word in the sequence
@@ -141,11 +160,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
         return self._session.send_command(command, re_string="successful")
 
     def _con_duplex(self, src_port, dst_port, command_logger=None):
-        command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
-        return self._session.send_command(command, re_string="successful")
+        if not self.is_logical_port_mode:
+            raise Exception("Bidirectional port mapping could be done only in logical port_mode "
+                            "current mode: {}".format(self._port_mode))
 
-    def _con_multicast(self, src_port, dst_port, command_logger=None):
-        command = "connect multicast prtnum {} to {} force".format(src_port, dst_port)
+        command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
         return self._session.send_command(command, re_string="successful")
 
     def _discon_simplex(self, src_port, dst_port, command_logger=None):
@@ -153,51 +172,79 @@ class NetscoutDriverHandler(DriverHandlerBase):
         return self._session.send_command(command, re_string="successful")
 
     def _discon_duplex(self, src_port, dst_port, command_logger=None):
-        command = "disconnect duplex prtnum {} force".format(src_port)
+        command = "disconnect duplex prtnum {} force".format(dst_port)
         return self._session.send_command(command, re_string="successful")
 
-    def _discon_multicast(self, src_port, dst_port, command_logger=None):
-        command = "disconnect multicast destination prtnum {} force".format(dst_port)
+    def _discon_multi(self, src_port, dst_port, command_logger=None):
+        command = "disconnect multicast destination {} force".format(dst_port)
         return self._session.send_command(command, re_string="successful")
+
+    def _show_port_connection(self, port):
+        command = "show prtnum {}".format(port)
+        return self._session.send_command(command, re_string=self._prompt)
+
+    def _validate_rx_subport(self, subport):
+        port, sub_idx = subport.split('-')
+        if sub_idx.upper() != self.RX_SUBPORT_INDEX.upper():
+            raise Exception("Transmitter sub-port can't be used as a destination")
+        return port
+
+    def _validate_tx_subport(self, subport):
+        port, sub_idx = subport.split('-')
+        if sub_idx.upper() != self.TX_SUBPORT_INDEX.upper():
+            raise Exception("Receiver sub-port can't be used as a source")
+        return port
 
     def map_bidi(self, src_port, dst_port, command_logger):
-        self._select_switch(command_logger=command_logger)
         src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
-
-        if self.force_duplex or self.connection_mode == "DUPLEX_TAP":
-            self._con_duplex(src_port_name, dst_port_name, command_logger)
-
-        elif self.connection_mode == "MULTICAST":
-            self._con_multicast(src_port_name, dst_port_name, command_logger)
-            self._con_multicast(dst_port_name, src_port_name, command_logger)
+        self._select_switch(command_logger=command_logger)
+        self._con_duplex(src_port_name, dst_port_name, command_logger)
 
     def map_uni(self, src_port, dst_port, command_logger):
-        self._select_switch(command_logger=command_logger)
-        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
+        if not self.is_logical_port_mode:
+            src_port[-1] = self._validate_tx_subport(src_port[-1])
+            dst_port[-1] = self._validate_rx_subport(dst_port[-1])
 
-        if self.connection_mode == "MULTICAST":
-            self._con_multicast(src_port_name, dst_port_name, command_logger)
+        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
+        self._select_switch(command_logger=command_logger)
+        self._con_simplex(src_port_name, dst_port_name, command_logger)
+
+    def map_clear_to(self, src_port, dst_port, command_logger):
+        if not self.is_logical_port_mode:
+            src_port[-1] = self._validate_tx_subport(src_port[-1])
+            dst_port[-1] = self._validate_rx_subport(dst_port[-1])
+
+        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
+        self._select_switch(command_logger=command_logger)
+        conn_info = self._show_port_connection(dst_port_name)
+        conn_info = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL).group(1)
+
+        conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
+                              r"(?P<src_name>.*?)[ ]{2,}"
+                              r".*?[ ]{2,}"  # src Rx Pwr(dBm)
+                              r"(?P<connection_type>.*?)[ ]{2,}"
+                              r"(?P<dst_addr>.*?)[ ]{2,}"
+                              r"(?P<dst_name>.*?)[ ]{2,}"
+                              r".*?[ ]{2,}"  # dst Rx Pwr(dBm)
+                              r"(?P<speed>.*)"
+                              r"(?P<protocol>.*)",
+                              conn_info)
+
+        disconn_type_map = {
+            "simplex": self._discon_simplex,
+            "duplex": self._discon_duplex,
+            "mcast": self._discon_multi,
+        }
+        try:
+            disconn_handler = disconn_type_map[conn_data.group("connection_type").lower()]
+        except KeyError:
+            command_logger.warning("Can't disconnect unhandled connection type. Connection info: {}".format(conn_info))
         else:
-            self._con_simplex(src_port_name, dst_port_name, command_logger)
+            # conn_info string output contains correct order for src/dst addresses
+            disconn_handler(conn_data.group("src_addr"), conn_data.group("dst_addr"), command_logger)
+
+    def map_clear(self, src_port, dst_port, command_logger):
+        return self.map_clear_to(src_port, dst_port, command_logger)
 
     def set_speed_manual(self, command_logger):
         command_logger.info("EXECUTE 'set_speed_manual' command")
-
-    def map_clear_to(self, src_port, dst_port, command_logger):
-        self._select_switch(command_logger=command_logger)
-        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
-
-        if self.connection_mode == "MULTICAST":
-            self._discon_multicast(src_port_name, dst_port_name, command_logger)
-        else:
-            self._discon_simplex(src_port_name, dst_port_name, command_logger)
-
-    def map_clear(self, src_port, dst_port, command_logger):
-        self._select_switch(command_logger=command_logger)
-        src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
-
-        if self.connection_mode == "MULTICAST":
-            self._discon_multicast(src_port_name, dst_port_name, command_logger)
-            self._discon_multicast(dst_port_name, src_port_name, command_logger)
-        else:
-            self._discon_duplex(src_port_name, dst_port_name, command_logger)

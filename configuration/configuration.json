@@ -6,11 +6,7 @@
     "connection_port": 53058,
     "device_prompt": "=>",
     "server_timeout": 10,
-    "runtime_configuration": "netscout_runtime_configuration.json",
-    "force_duplex": true,
-    "connection_mode": "DUPLEX_TAP",
-    "standalone_tap": false,
-    "switch_name": "OS-192"
+    "runtime_configuration": "netscout_runtime_configuration.json"
   },
 
   "cli_variable": {
@@ -20,6 +16,7 @@
   },
 
   "driver_variable": {
+    "port_mode": "logical",
     "resource_name": [
       "Switch {0}",
       "Chassis {0}",

@@ -1,8 +1,5 @@
 import sys
 
-# todo(A.Piddubny): hack to run the server from the CLI
-# sys.path.append('../cloudshell-L1-networking-core')
-
 from common.configuration_parser import ConfigurationParser
 from common.helper.system_helper import get_file_folder
 from common.server_connection import ServerConnection

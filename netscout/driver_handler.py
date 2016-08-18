@@ -1,4 +1,5 @@
 import re
+from collections import OrderedDict
 
 from common.configuration_parser import ConfigurationParser
 from common.driver_handler_base import DriverHandlerBase
@@ -8,6 +9,12 @@ from common.resource_info import ResourceInfo
 class NetscoutDriverHandler(DriverHandlerBase):
     TX_SUBPORT_INDEX = 'TX'
     RX_SUBPORT_INDEX = 'RX'
+
+    GENERIC_ERRORS = OrderedDict([
+        ("[Ii]nvalid", "Command is invalid"),
+        ("[Nn]ot [Ll]ogged", "User is not logged in"),
+        ("error|ERROR", "Failed to perform command"),
+    ])
 
     def __init__(self):
         DriverHandlerBase.__init__(self)
@@ -19,11 +26,19 @@ class NetscoutDriverHandler(DriverHandlerBase):
     def login(self, address, username, password, command_logger=None):
         self._session.connect(address, username, password, re_string=self._prompt)
         command = 'logon {} {}'.format(username, password)
-        self._session.send_command(command, re_string='is now logged on')
+        error_map = OrderedDict([
+            ("[Aa]ccess [Dd]enied", "Invalid username/password for login"),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def logout(self, command_logger=None):
         command = 'logoff'
-        self._session.send_command(command, re_string='is now logged off')
+        error_map = OrderedDict([
+            ("[Nn]o [Uu]ser", "User is not logged in"),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     @property
     def is_logical_port_mode(self):
@@ -31,15 +46,23 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
     def _disp_switch_info(self, switch_name):
         command = "display information switch {}".format(switch_name)
-        return self._session.send_command(command, re_string=self._prompt)
+        error_map = OrderedDict([
+            ("[Nn]ot [Ff]ound", "Switch {} was not found".format(switch_name)),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _disp_status(self):
         command = "display status"
-        return self._session.send_command(command, re_string=self._prompt)
+        return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def _show_ports_info(self, switch_name):
         command = "show port info * swi {}".format(switch_name)
-        return self._session.send_command(command, re_string=self._prompt)
+        error_map = OrderedDict([
+            ("[Nn]ot [Ff]ound", "Switch {} was not found".format(switch_name)),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def get_resource_description(self, address, command_logger=None):
         # todo(A.Piddubny): handle incoming MAP
@@ -153,35 +176,55 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
     def _select_switch(self, command_logger=None):
         command = 'select switch {}'.format(self.switch_name)
-        self._session.send_command(command, re_string='has been selected')
+        error_map = OrderedDict([
+            ("[Nn]ot [Ff]ound", "Switch {} was not found".format(self.switch_name)),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _con_simplex(self, src_port, dst_port, command_logger=None):
         command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
-        return self._session.send_command(command, re_string="successful")
+        error_map = OrderedDict([
+            ("[Nn]ot [Ff]ound", "Subport was not found"),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _con_duplex(self, src_port, dst_port, command_logger=None):
         if not self.is_logical_port_mode:
             raise Exception("Bidirectional port mapping could be done only in logical port_mode "
                             "current mode: {}".format(self._port_mode))
-
+        error_map = OrderedDict([
+            ("[Nn]ot [Ff]ound", "Subport was not found"),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
         command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
-        return self._session.send_command(command, re_string="successful")
+        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _discon_simplex(self, src_port, dst_port, command_logger=None):
         command = "disconnect simplex {} force".format(dst_port)
-        return self._session.send_command(command, re_string="successful")
+        error_map = OrderedDict([
+            ("[Nn]ot [Ss]implex", "Subport is not simplex connected"),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _discon_duplex(self, src_port, dst_port, command_logger=None):
         command = "disconnect duplex prtnum {} force".format(dst_port)
-        return self._session.send_command(command, re_string="successful")
+        return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def _discon_multi(self, src_port, dst_port, command_logger=None):
         command = "disconnect multicast destination {} force".format(dst_port)
-        return self._session.send_command(command, re_string="successful")
+        return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def _show_port_connection(self, port):
         command = "show prtnum {}".format(port)
-        return self._session.send_command(command, re_string=self._prompt)
+        error_map = OrderedDict([
+            ("[Ii]ncorrect", "Incorrect port number format"),
+            ("[Nn]ot [Ff]ound", "Connection not found"),
+        ])
+        error_map.update(self.GENERIC_ERRORS)
+        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _validate_rx_subport(self, subport):
         port, sub_idx = subport.split('-')
@@ -217,8 +260,12 @@ class NetscoutDriverHandler(DriverHandlerBase):
         src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
         self._select_switch(command_logger=command_logger)
         conn_info = self._show_port_connection(dst_port_name)
-        conn_info = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL).group(1)
 
+        if "connection not found" in conn_info.lower():
+            command_logger.warning("Trying to clear connection which doesn't exist for port {}".format(dst_port_name))
+            return
+
+        conn_info = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL).group(1)
         conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                               r"(?P<src_name>.*?)[ ]{2,}"
                               r".*?[ ]{2,}"  # src Rx Pwr(dBm)

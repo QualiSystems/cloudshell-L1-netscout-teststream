@@ -35,6 +35,7 @@ if __name__ == '__main__':
     request_manager.bind_command('mapuni', (NetscoutRequestHandler.map_uni, request_handler))
     request_manager.bind_command('mapclearto', (NetscoutRequestHandler.map_clear_to, request_handler))
     request_manager.bind_command('mapclear', (NetscoutRequestHandler.map_clear, request_handler))
+    request_manager.bind_command('setspeedmanual', (NetscoutRequestHandler.set_speed_manual, request_handler))
 
     server_connection = ServerConnection(SERVER_HOST, port, request_manager, exe_folder_str)
     server_connection.start_listeninig()

@@ -64,8 +64,44 @@ class NetscoutDriverHandler(DriverHandlerBase):
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
+    def _show_connections(self):
+        command = "show connection switch {}".format(self.switch_name)
+        return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
+
+    def _get_port_mappings(self, command_logger):
+        connections = self._show_connections()
+        mapping_info = {}
+
+        if "connection not found" in connections.lower():
+            return mapping_info
+
+        connections_list = re.search(r".*-\n(.*)\n\n", connections, re.DOTALL).group(1).split('\n')
+        for conn_info in connections_list:
+            conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
+                                  r"(?P<src_name>.*?)[ ]{2,}"
+                                  r".*?[ ]{2,}"  # src Rx Pwr(dBm)
+                                  r"(?P<connection_type>.*?)[ ]{2,}"
+                                  r"(?P<dst_addr>.*?)[ ]{2,}"
+                                  r"(?P<dst_name>.*?)[ ]{2,}"
+                                  r".*?[ ]{2,}"  # dst Rx Pwr(dBm)
+                                  r"(?P<speed>.*)"
+                                  r"(?P<protocol>.*)",
+                                  conn_info)
+            conn_type = conn_data.group('connection_type').lower()
+            src = conn_data.group('src_addr')
+            dst = conn_data.group('dst_addr')
+
+            if conn_type in ('simplex', 'mcast'):
+                mapping_info[dst] = src
+            elif conn_type == 'duplex':
+                mapping_info[dst] = src
+                mapping_info[src] = dst
+            else:
+                command_logger.warning("Can't set mapping for unhandled connection type. "
+                                       "Connection info: {}".format(conn_data))
+        return mapping_info
+
     def get_resource_description(self, address, command_logger=None):
-        # todo(A.Piddubny): handle incoming MAP
         depth = 0
         resource_info = ResourceInfo()
         resource_info.set_depth(depth)
@@ -94,6 +130,8 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
         ports_list = re.search(r".*-\n(.*)\n\n", ports_info, re.DOTALL).group(1).split("\n")
         all_ports = {}
+
+        port_mappings = self._get_port_mappings(command_logger)
 
         for port in ports_list:
             info = re.search(r"(?P<phys_addr>.*?)[ ]{2,}"
@@ -131,7 +169,8 @@ class NetscoutDriverHandler(DriverHandlerBase):
                 blade_ports = chassis_ports.get(blade_no, [])
 
                 for port_data in blade_ports:
-                    port_no = int(port_data["phys_addr"].split(".")[-1])
+                    phys_addr = port_data["phys_addr"]
+                    port_no = int(phys_addr.split(".")[-1])
 
                     if self.is_logical_port_mode:
                         port_resource = ResourceInfo()
@@ -140,11 +179,15 @@ class NetscoutDriverHandler(DriverHandlerBase):
                         port_resource.set_index(str(port_no))
                         port_resource.add_attribute("Protocol Type", 0)
 
-                        # todo(A.Piddubny): will not show simplex connections ! use separate command for this
+                        connected_resource = self._get_connected_resource(phys_addr, port_mappings)
+                        if connected_resource:
+                            port_resource.set_mapping("{}/{}".format(address, connected_resource))
+
                         # if port_data["status"].lower() == "not connected":
                         #     port_resource.add_attribute("State", "Enable")
                         # else:
                         #     port_resource.add_attribute("State", "Disable")
+
                         blade_resource.add_child(port_no, port_resource)
                     else:
                         for subport in (self.TX_SUBPORT_INDEX, self.RX_SUBPORT_INDEX):
@@ -155,6 +198,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
                             subport_resource.set_index(subport_idx)
                             subport_resource.add_attribute("Protocol Type", 0)
                             blade_resource.add_child(subport_idx, subport_resource)
+
+                            if subport == self.RX_SUBPORT_INDEX:
+                                connected_resource = self._get_connected_resource(phys_addr, port_mappings)
+                                if connected_resource:
+                                    subport_resource.set_mapping("{}/{}".format(address, connected_resource))
 
             elif info_str.startswith(" " * 2):
                 # blade type is the last word in the sequence
@@ -168,6 +216,18 @@ class NetscoutDriverHandler(DriverHandlerBase):
                 chassis_resource.add_child(info_str, blade_resource)
 
         return resource_info.convert_to_xml()
+
+    def _get_connected_resource(self, phys_addr, port_mappings):
+        if phys_addr not in port_mappings:
+            return None
+
+        resource_addr = port_mappings[phys_addr]
+        # remove leading zero from the address ("1.1.1" instead of "01.01.01")
+        resource_addr = "/".join([str(int(part)) for part in resource_addr.split(".")])
+        if not self.is_logical_port_mode:
+            resource_addr = "{}-{}".format(resource_addr, self.TX_SUBPORT_INDEX)
+
+        return resource_addr
 
     def _convert_port_names(self, src_port, dst_port):
         return [
@@ -221,7 +281,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = "show prtnum {}".format(port)
         error_map = OrderedDict([
             ("[Ii]ncorrect", "Incorrect port number format"),
-            ("[Nn]ot [Ff]ound", "Connection not found"),
+            # ("[Nn]ot [Ff]ound", "Connection not found"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)

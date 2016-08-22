@@ -42,16 +42,18 @@ class TestNetscoutDriverHandler(unittest.TestCase):
     @mock.patch('netscout.driver_handler.OrderedDict')
     def test_select_switch(self, ordered_dict_class):
         ordered_dict_class.return_value = error_map = mock.MagicMock()
-        self.tested_instance._select_switch()
+        logger = mock.MagicMock()
+        self.tested_instance._select_switch(logger)
         self.tested_instance._session.send_command.assert_called_once_with(
-            "select switch {}".format(self.tested_instance.switch_name),
+            "select switch {}".format(self.tested_instance._switch_name),
             re_string=self.tested_instance._prompt,
             error_map=error_map)
 
     @mock.patch('netscout.driver_handler.OrderedDict')
     def test_con_simplex(self, ordered_dict_class):
         ordered_dict_class.return_value = error_map = mock.MagicMock()
-        self.tested_instance._con_simplex(src_port=self.src_port, dst_port=self.dst_port)
+        logger = mock.MagicMock()
+        self.tested_instance._con_simplex(src_port=self.src_port, dst_port=self.dst_port, command_logger=logger)
         self.tested_instance._session.send_command.assert_called_once_with(
             "connect simplex prtnum {} to {} force".format(
                 self.src_port, self.dst_port),
@@ -61,8 +63,9 @@ class TestNetscoutDriverHandler(unittest.TestCase):
     @mock.patch('netscout.driver_handler.OrderedDict')
     def test_con_duplex_for_logical_mode(self, ordered_dict_class):
         ordered_dict_class.return_value = error_map = mock.MagicMock()
+        logger = mock.MagicMock()
         self.tested_instance.is_logical_port_mode = True
-        result = self.tested_instance._con_duplex(src_port=self.src_port, dst_port=self.dst_port)
+        result = self.tested_instance._con_duplex(src_port=self.src_port, dst_port=self.dst_port, command_logger=logger)
         self.tested_instance._session.send_command.assert_called_once_with(
             "connect duplex prtnum {} to {} force".format(self.src_port, self.dst_port),
             re_string=self.tested_instance._prompt,
@@ -71,8 +74,11 @@ class TestNetscoutDriverHandler(unittest.TestCase):
 
     def test_con_duplex_raises_exception_for_physical_mode(self):
         self.tested_instance.is_logical_port_mode = False
+        command_logger = mock.MagicMock()
         with self.assertRaises(Exception) as inst:
-            self.tested_instance._con_duplex(src_port=self.src_port, dst_port=self.dst_port)
+            self.tested_instance._con_duplex(src_port=self.src_port,
+                                             dst_port=self.dst_port,
+                                             command_logger=command_logger)
         self.assertEquals(str(inst.exception),
                           "Bidirectional port mapping could be done only in logical port_mode "
                           "current mode: {}".format(self.tested_instance._port_mode))
@@ -80,7 +86,10 @@ class TestNetscoutDriverHandler(unittest.TestCase):
     @mock.patch('netscout.driver_handler.OrderedDict')
     def test_discon_simplex(self, ordered_dict_class):
         ordered_dict_class.return_value = error_map = mock.MagicMock()
-        result = self.tested_instance._discon_simplex(src_port=self.src_port, dst_port=self.dst_port)
+        logger = mock.MagicMock()
+        result = self.tested_instance._discon_simplex(src_port=self.src_port,
+                                                      dst_port=self.dst_port,
+                                                      command_logger=logger)
         self.tested_instance._session.send_command.assert_called_once_with(
             "disconnect simplex {} force".format(self.dst_port),
             re_string=self.tested_instance._prompt,
@@ -88,7 +97,10 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         self.assertEquals(result, self.tested_instance._session.send_command())
 
     def test_discon_duplex(self):
-        result = self.tested_instance._discon_duplex(src_port=self.src_port, dst_port=self.dst_port)
+        logger = mock.MagicMock()
+        result = self.tested_instance._discon_duplex(src_port=self.src_port,
+                                                     dst_port=self.dst_port,
+                                                     command_logger=logger)
         self.tested_instance._session.send_command.assert_called_once_with(
             "disconnect duplex prtnum {} force".format(self.dst_port),
             re_string=self.tested_instance._prompt,
@@ -96,7 +108,10 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         self.assertEquals(result, self.tested_instance._session.send_command())
 
     def test_discon_multi(self):
-        result = self.tested_instance._discon_multi(src_port=self.src_port, dst_port=self.dst_port)
+        logger = mock.MagicMock()
+        result = self.tested_instance._discon_multi(src_port=self.src_port,
+                                                    dst_port=self.dst_port,
+                                                    command_logger=logger)
         self.tested_instance._session.send_command.assert_called_once_with(
             "disconnect multicast destination {} force".format(self.dst_port),
             re_string=self.tested_instance._prompt,
@@ -104,22 +119,54 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         self.assertEquals(result, self.tested_instance._session.send_command())
 
     @mock.patch('netscout.driver_handler.OrderedDict')
-    def test_login(self, ordered_dict_class):
+    def test_login_without_port_in_address(self, ordered_dict_class):
         ordered_dict_class.return_value = error_map = mock.MagicMock()
-        address, username, password = "address", "username", "password"
-        self.tested_instance.login(address=address, username=username, password=password)
+        logger = mock.MagicMock()
+        host = 'test_host'
+        switch_name = 'test_switch_name'
+        username = "test_username"
+        password = "test_password"
+        address = "{}?Horizon={}".format(host, switch_name)
+        port = None
+
+        self.tested_instance.login(address=address, username=username, password=password, command_logger=logger)
         self.tested_instance._session.connect.assert_called_once_with(
-            address, username, password, re_string=self.tested_instance._prompt)
+            host, username, password, port, re_string=self.tested_instance._prompt)
 
         self.tested_instance._session.send_command.assert_called_once_with(
             "logon {} {}".format(username, password),
             re_string=self.tested_instance._prompt,
             error_map=error_map)
 
+        self.assertEquals(self.tested_instance._switch_name, switch_name)
+
+    @mock.patch('netscout.driver_handler.OrderedDict')
+    def test_login_with_port_in_address(self, ordered_dict_class):
+        ordered_dict_class.return_value = error_map = mock.MagicMock()
+        logger = mock.MagicMock()
+        host = 'test_host'
+        port = 8888
+        switch_name = 'test_switch_name'
+        username = "test_username"
+        password = "test_password"
+        address = "{}:{}?Horizon={}".format(host, port, switch_name)
+
+        self.tested_instance.login(address=address, username=username, password=password, command_logger=logger)
+        self.tested_instance._session.connect.assert_called_once_with(
+            host, username, password, port, re_string=self.tested_instance._prompt)
+
+        self.tested_instance._session.send_command.assert_called_once_with(
+            "logon {} {}".format(username, password),
+            re_string=self.tested_instance._prompt,
+            error_map=error_map)
+
+        self.assertEquals(self.tested_instance._switch_name, switch_name)
+
     @mock.patch('netscout.driver_handler.OrderedDict')
     def test_logout(self, ordered_dict_class):
         ordered_dict_class.return_value = error_map = mock.MagicMock()
-        self.tested_instance.logout()
+        logger = mock.MagicMock()
+        self.tested_instance.logout(logger)
         self.tested_instance._session.send_command.assert_called_once_with(
             "logoff", re_string=self.tested_instance._prompt, error_map=error_map)
 
@@ -292,21 +339,21 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         dst_port_input = mock.MagicMock()
         self.tested_instance.map_clear_to = mock.MagicMock()
 
-        result = self.tested_instance.map_clear(src_port=src_port_input, dst_port=dst_port_input, command_logger=logger)
+        self.tested_instance.map_clear(src_port=src_port_input, dst_port=dst_port_input, command_logger=logger)
 
         self.tested_instance.map_clear_to.assert_called_once_with(src_port_input, dst_port_input, logger)
-        self.assertEquals(result, self.tested_instance.map_clear_to())
 
     @mock.patch('netscout.driver_handler.ResourceInfo')
     def test_get_resource_description(self, resource_info_class):
         resource_info = mock.MagicMock()
+        logger = mock.MagicMock()
         resource_info_class.return_value = resource_info
         self.tested_instance._disp_switch_info = mock.MagicMock()
         self.tested_instance._disp_status = mock.MagicMock()
         self.tested_instance._show_ports_info = mock.MagicMock()
 
         with mock.patch("re.search"):
-            result = self.tested_instance.get_resource_description('test_address')
+            result = self.tested_instance.get_resource_description('test_address', logger)
 
         self.tested_instance._disp_switch_info.assert_called_once()
         self.tested_instance._disp_status.assert_called_once()

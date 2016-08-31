@@ -45,7 +45,7 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         logger = mock.MagicMock()
         self.tested_instance._select_switch(logger)
         self.tested_instance._session.send_command.assert_called_once_with(
-            "select switch {}".format(self.tested_instance._switch_name),
+            'select switch "{}"'.format(self.tested_instance._switch_name),
             re_string=self.tested_instance._prompt,
             error_map=error_map)
 
@@ -360,3 +360,53 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         self.tested_instance._show_ports_info.assert_called_once()
         resource_info.convert_to_xml.assert_called_once()
         self.assertEquals(result, resource_info.convert_to_xml())
+
+    def test_is_logical_port_mode_returns_true(self):
+        self.tested_instance._port_mode = "LOGICAL"
+        self.assertTrue(self.tested_instance.is_logical_port_mode)
+
+    def test_is_logical_port_mode_returns_false(self):
+        self.tested_instance._port_mode = "physical"
+        self.assertFalse(self.tested_instance.is_logical_port_mode)
+
+    @mock.patch('netscout.driver_handler.OrderedDict')
+    def test_disp_switch_info(self, ordered_dict_class):
+        ordered_dict_class.return_value = error_map = mock.MagicMock()
+        self.tested_instance._disp_switch_info()
+        self.tested_instance._session.send_command.assert_called_once_with(
+            'display information switch "{}"'.format(self.tested_instance._switch_name),
+            re_string=self.tested_instance._prompt,
+            error_map=error_map)
+
+    def test_disp_status(self):
+        self.tested_instance._disp_status()
+        self.tested_instance._session.send_command.assert_called_once_with(
+            'display status',
+            re_string=self.tested_instance._prompt,
+            error_map=self.tested_instance.GENERIC_ERRORS)
+
+    @mock.patch('netscout.driver_handler.OrderedDict')
+    def test_show_port_connection(self, ordered_dict_class):
+        ordered_dict_class.return_value = error_map = mock.MagicMock()
+        port = mock.MagicMock()
+        self.tested_instance._show_port_connection(port)
+        self.tested_instance._session.send_command.assert_called_once_with(
+            'show prtnum {}'.format(port),
+            re_string=self.tested_instance._prompt,
+            error_map=error_map)
+
+    def test_show_connections(self):
+        self.tested_instance._show_connections()
+        self.tested_instance._session.send_command.assert_called_once_with(
+            'show connection switch "{}"'.format(self.tested_instance._switch_name),
+            re_string=self.tested_instance._prompt,
+            error_map=self.tested_instance.GENERIC_ERRORS)
+
+    @mock.patch('netscout.driver_handler.OrderedDict')
+    def test_show_ports_info(self, ordered_dict_class):
+        ordered_dict_class.return_value = error_map = mock.MagicMock()
+        self.tested_instance._show_ports_info()
+        self.tested_instance._session.send_command.assert_called_once_with(
+            'show port info * swi "{}"'.format(self.tested_instance._switch_name),
+            re_string=self.tested_instance._prompt,
+            error_map=error_map)

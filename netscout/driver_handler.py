@@ -73,9 +73,9 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
         :return: (str) output for switch info command from the device
         """
-        command = "display information switch {}".format(self._switch_name)
+        command = 'display information switch "{}"'.format(self._switch_name)
         error_map = OrderedDict([
-            ("[Nn]ot [Ff]ound", "Switch {} was not found".format(self._switch_name)),
+            ("[Nn]ot [Ff]ound", 'Switch "{}" was not found'.format(self._switch_name)),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
@@ -93,9 +93,9 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
         :return: (str) output for show port info command from the device
         """
-        command = "show port info * swi {}".format(self._switch_name)
+        command = 'show port info * swi "{}"'.format(self._switch_name)
         error_map = OrderedDict([
-            ("[Nn]ot [Ff]ound", "Switch {} was not found".format(self._switch_name)),
+            ("[Nn]ot [Ff]ound", 'Switch "{}" was not found'.format(self._switch_name)),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
@@ -105,7 +105,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
         :return: (str) output for show connections command from the device
         """
-        command = "show connection switch {}".format(self._switch_name)
+        command = 'show connection switch "{}"'.format(self._switch_name)
         return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def _get_port_mappings(self, command_logger):
@@ -307,9 +307,9 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: None
         """
-        command = 'select switch {}'.format(self._switch_name)
+        command = 'select switch "{}"'.format(self._switch_name)
         error_map = OrderedDict([
-            ("[Nn]ot [Ff]ound", "Switch {} was not found".format(self._switch_name)),
+            ("[Nn]ot [Ff]ound", 'Switch "{}" was not found'.format(self._switch_name)),
         ])
         error_map.update(self.GENERIC_ERRORS)
         self._session.send_command(command, re_string=self._prompt, error_map=error_map)

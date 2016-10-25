@@ -1,0 +1,39 @@
+{
+  "common_variable": {
+    "driver_name": "NetScout",
+    "driver_module": ["netscout.driver_handler", "NetscoutDriverHandler"],
+    "connection_type": "tcp",
+    "connection_port": 53058,
+    "device_prompt": "=>",
+    "server_timeout": 10,
+    "runtime_configuration": "netscout_runtime_configuration.json"
+  },
+
+  "cli_variable": {
+    "ssh": ["common.cli.ssh_session", "SSHSession"],
+    "telnet": ["common.cli.telnet_session", "TelnetSession"],
+    "tcp": ["common.cli.tcp_session", "TCPSession"]
+  },
+
+  "driver_variable": {
+    "port_mode": "logical",
+    "resource_name": [
+      "Switch {0}",
+      "Chassis {0}",
+      "Blade {0}",
+      "Port {0}"
+    ],
+    "resource_family_name": [
+      "L1 Optical Switch",
+      "L1 Optical Switch Chassis Controller",
+      "L1 Optical Switch Blade",
+      "L1 Optical Switch Port"
+    ],
+    "resource_model_name": [
+      "{0}",
+      "NetScout Switch 3900 Chassis Controller",
+      "{0}",
+      "Port {0}"
+    ]
+  }
+}

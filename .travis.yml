@@ -1,9 +1,18 @@
 language: python
 python:
-    - '2.7'
+    - "2.7"
 
-before_install:
-    - pip install -r requirements.txt
-    - pip install -r test-requirements.txt
+install:
+    - 'if [ ${TRAVIS_BRANCH} \!= "master" ] && [ -f dev_requirements.txt ]; then
+        pip install --extra-index-url https://testpypi.python.org/pypi -r dev_requirements.txt;
+      else
+        pip install -r requirements.txt;
+      fi'
+    - pip install -r test_requirements.txt
+    - pip install coveralls
 
-script: nosetests
+script:
+    - nosetests --with-coverage --cover-package=netscout tests
+
+after_success:
+    - coveralls

@@ -1,7 +1,10 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import mock
 import unittest
 
 from netscout import driver_handler
-import mock
 
 
 class TestNetscoutDriverHandler(unittest.TestCase):
@@ -391,7 +394,7 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         port = mock.MagicMock()
         self.tested_instance._show_port_connection(port)
         self.tested_instance._session.send_command.assert_called_once_with(
-            'show prtnum {}'.format(port),
+            'show conn prtnum {}'.format(port),
             re_string=self.tested_instance._prompt,
             error_map=error_map)
 

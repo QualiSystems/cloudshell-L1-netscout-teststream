@@ -1,0 +1,7 @@
+{
+  "driver_variable": {
+    "connection_port": 53058,
+    "port_mode": "logical",
+    "server_timeout": 20
+  }
+}

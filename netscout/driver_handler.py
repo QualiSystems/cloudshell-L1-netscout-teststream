@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import re
 from collections import OrderedDict
 
@@ -11,9 +14,10 @@ class NetscoutDriverHandler(DriverHandlerBase):
     RX_SUBPORT_INDEX = 'RX'
 
     GENERIC_ERRORS = OrderedDict([
+        ("[Ee]rror|ERROR", "Error during command execution"),
         ("[Ii]nvalid", "Command is invalid"),
         ("[Nn]ot [Ll]ogged", "User is not logged in"),
-        ("error|ERROR", "Failed to perform command"),
+        ("(?<![R|r]ead) error", "Failed to perform command"),
     ])
 
     def __init__(self):
@@ -98,7 +102,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
             ("[Nn]ot [Ff]ound", 'Switch "{}" was not found'.format(self._switch_name)),
         ])
         error_map.update(self.GENERIC_ERRORS)
-        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
+        return self._session.send_command(command, timeout=60, re_string=self._prompt, error_map=error_map)
 
     def _show_connections(self):
         """Execute show connections by switch command on the device
@@ -120,7 +124,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
         if "connection not found" in connections.lower():
             return mapping_info
 
-        connections_list = re.search(r".*-\n(.*)\n\n", connections, re.DOTALL).group(1).split('\n')
+        connections_list = re.search(r".*-\n(.*)\n\n", connections, re.DOTALL)
+        if connections_list is None:
+            return mapping_info
+        else:
+            connections_list = connections_list.group(1).split('\n')
         for conn_info in connections_list:
             conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                                   r"(?P<src_name>.*?)[ ]{2,}"
@@ -210,10 +218,15 @@ class NetscoutDriverHandler(DriverHandlerBase):
             elif info_str.startswith(" " * 4):
                 # add ports
                 blade_info = re.search(
-                    r"(?P<vendor>.*),(?P<model>.*),(?P<uboot_rev>.*),(?P<serial_number>.*)", info_str, re.DOTALL)
+                    r"(?P<model>.*?)\s{2,}(?P<uboot_rev>.*?)\s{2,}(?P<serial_number>.*?)(\s{2,}|$)",
+                    info_str.strip(),
+                    re.DOTALL)
 
                 # blade_resource.add_attribute("Vendor", blade_info.group("vendor"))
-                # blade_resource.add_attribute("Uboot Rev.", blade_info.group("uboot_rev"))
+                blade_type = blade_info.group("model")
+                blade_resource.set_model_name(blade_type)
+                # blade_resource.add_attribute("Model", blade_info.group("model"))
+                blade_resource.add_attribute("Uboot Rev.", blade_info.group("uboot_rev"))
                 blade_resource.set_serial_number(blade_info.group("serial_number"))
 
                 chassis_ports = all_ports.get(chassis_no, {})
@@ -257,11 +270,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
             elif info_str.startswith(" " * 2):
                 # blade type is the last word in the sequence
-                blade_type = info_str.rstrip().rsplit(' ')[-1]
+                # blade_type = info_str.rstrip().rsplit(' ')[-1]
                 blade_no = int(re.search(r"(\d+)", info_str).group(1))
 
                 blade_resource = ResourceInfo()
-                blade_resource.set_model_name(blade_type)
+                # blade_resource.set_model_name(blade_type)
                 blade_resource.set_depth(depth + 2)
                 blade_resource.set_index(str(blade_no))
                 chassis_resource.add_child(info_str, blade_resource)
@@ -325,6 +338,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
+            ("[Nn]ot compatible", "Ports\Subports not compatible"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
@@ -342,6 +356,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
                             "current mode: {}".format(self._port_mode))
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
+            ("[Nn]ot compatible", "Ports\Subports not compatible"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
@@ -390,7 +405,8 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param port: (str) source/destination port in format "<chassis>.<blade>.<port>"
         :return: (str) output for the show port connection command
         """
-        command = "show prtnum {}".format(port)
+        command = "show conn prtnum {}".format(port)
+        # command = "show prtnum {}".format(port)
         error_map = OrderedDict([
             ("[Ii]ncorrect", "Incorrect port number format"),
             # ("[Nn]ot [Ff]ound", "Connection not found"),
@@ -472,11 +488,16 @@ class NetscoutDriverHandler(DriverHandlerBase):
         self._select_switch(command_logger=command_logger)
         conn_info = self._show_port_connection(dst_port_name)
 
-        if "connection not found" in conn_info.lower():
+        # if "connection not found" in conn_info.lower():
+        #     command_logger.warning("Trying to clear connection which doesn't exist for port {}".format(dst_port_name))
+        #     return
+
+        matched = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL)
+        if matched is None:
             command_logger.warning("Trying to clear connection which doesn't exist for port {}".format(dst_port_name))
             return
 
-        conn_info = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL).group(1)
+        conn_info = matched.group(1)
         conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                               r"(?P<src_name>.*?)[ ]{2,}"
                               r".*?[ ]{2,}"  # src Rx Pwr(dBm)

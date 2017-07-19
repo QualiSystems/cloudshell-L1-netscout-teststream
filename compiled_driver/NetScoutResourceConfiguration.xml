@@ -196,7 +196,7 @@
     </Module>
   </Modules>
   <ResourceFamilies>
-    <ResourceFamily Name="L1 Optical Switch" IsMappableContainer="true" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="true" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
+    <ResourceFamily Name="L1 Switch" IsMappableContainer="true" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="true" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes>
         <AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
           <AllowedValues />
@@ -210,7 +210,7 @@
         <AttributeValue Name="Password" Value="" />
       </AttributeValues>
       <Models>
-        <ResourceModel Name="OS-192" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="3900" Description="NetScout 3900 Driver" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues>
             <AttributeValue Name="User" Value="" />
@@ -218,16 +218,38 @@
           </AttributeValues>
           <ParentModels />
           <Drivers>
-            <DriverName>NetScout 3900 Driver</DriverName>
+            <DriverName>NetScout 390x Driver</DriverName>
+          </Drivers>
+        </ResourceModel>
+        <ResourceModel Name="3901" Description="NetScout 3901 Driver" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="User" Value="" />
+            <AttributeValue Name="Password" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>NetScout 390x Driver</DriverName>
+          </Drivers>
+        </ResourceModel>
+        <ResourceModel Name="3903" Description="NetScout 3903 Driver" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="User" Value="" />
+            <AttributeValue Name="Password" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>NetScout 390x Driver</DriverName>
           </Drivers>
         </ResourceModel>
       </Models>
     </ResourceFamily>
-    <ResourceFamily Name="L1 Optical Switch Port" IsMappableContainer="false" IsMappable="true" IsConnectable="true" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="true" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
+    <ResourceFamily Name="L1 Switch Port" IsMappableContainer="false" IsMappable="true" IsConnectable="true" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="true" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="Port O-Blade" SupportsConcurrentCommands="false">
+        <ResourceModel Name="Port O-BLADE" SupportsConcurrentCommands="false">
           <AttachedAttributes>
             <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
               <AllowedValues>
@@ -245,35 +267,97 @@
             <AttributeValue Name="Protocol Type" Value="0" />
           </AttributeValues>
           <ParentModels>
-            <ParentModelName>O-Blade</ParentModelName>
+            <ParentModelName>O-BLADE</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
+        <ResourceModel Name="Port S-BLADE" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>2</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>0</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol" Value="2" />
+            <AttributeValue Name="Protocol Type" Value="0" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>S-BLADE</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
+        <ResourceModel Name="Port S-BLADE-PRO" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>2</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>0</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol" Value="2" />
+            <AttributeValue Name="Protocol Type" Value="0" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>S-BLADE-PRO</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
       </Models>
     </ResourceFamily>
-    <ResourceFamily Name="L1 Optical Switch Chassis Controller" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
+    <ResourceFamily Name="L1 Switch Chassis Controller" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="NetScout Switch 3900 Chassis Controller" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="NetScout Switch 390x Chassis Controller" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
-            <ParentModelName>OS-192</ParentModelName>
+            <ParentModelName>3900</ParentModelName>
+            <ParentModelName>3901</ParentModelName>
+            <ParentModelName>3903</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
       </Models>
     </ResourceFamily>
-    <ResourceFamily Name="L1 Optical Switch Blade" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
+    <ResourceFamily Name="L1 Switch Blade" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="O-Blade" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="O-BLADE" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
-            <ParentModelName>NetScout Switch 3900 Chassis Controller</ParentModelName>
+            <ParentModelName>NetScout Switch 390x Chassis Controller</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
+        <ResourceModel Name="S-BLADE" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels>
+            <ParentModelName>NetScout Switch 390x Chassis Controller</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
+        <ResourceModel Name="S-BLADE-PRO" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels>
+            <ParentModelName>NetScout Switch 390x Chassis Controller</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
@@ -281,6 +365,6 @@
     </ResourceFamily>
   </ResourceFamilies>
   <DriverDescriptors>
-    <DriverDescriptor Name="NetScout 3900 Driver" DriverType="L1SwitchTclDriver" CustomParams="Netscout.exe" />
+    <DriverDescriptor Name="NetScout 390x Driver" DriverType="L1SwitchTclDriver" CustomParams="NetScout_TestStream.exe" />
   </DriverDescriptors>
 </ResourceManagementExportImport>

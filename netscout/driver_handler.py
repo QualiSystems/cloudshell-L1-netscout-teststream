@@ -14,6 +14,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
     RX_SUBPORT_INDEX = 'RX'
 
     GENERIC_ERRORS = OrderedDict([
+        ("[Ee]rror|ERROR", "Error during command execution"),
         ("[Ii]nvalid", "Command is invalid"),
         ("[Nn]ot [Ll]ogged", "User is not logged in"),
         ("(?<![R|r]ead) error", "Failed to perform command"),
@@ -123,7 +124,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
         if "connection not found" in connections.lower():
             return mapping_info
 
-        connections_list = re.search(r".*-\n(.*)\n\n", connections, re.DOTALL).group(1).split('\n')
+        connections_list = re.search(r".*-\n(.*)\n\n", connections, re.DOTALL)
+        if connections_list is None:
+            return mapping_info
+        else:
+            connections_list = connections_list.group(1).split('\n')
         for conn_info in connections_list:
             conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                                   r"(?P<src_name>.*?)[ ]{2,}"
@@ -333,6 +338,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
+            ("[Nn]ot compatible", "Ports\Subports not compatible"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
@@ -350,6 +356,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
                             "current mode: {}".format(self._port_mode))
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
+            ("[Nn]ot compatible", "Ports\Subports not compatible"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
@@ -481,11 +488,16 @@ class NetscoutDriverHandler(DriverHandlerBase):
         self._select_switch(command_logger=command_logger)
         conn_info = self._show_port_connection(dst_port_name)
 
-        if "connection not found" in conn_info.lower():
+        # if "connection not found" in conn_info.lower():
+        #     command_logger.warning("Trying to clear connection which doesn't exist for port {}".format(dst_port_name))
+        #     return
+
+        matched = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL)
+        if matched is None:
             command_logger.warning("Trying to clear connection which doesn't exist for port {}".format(dst_port_name))
             return
 
-        conn_info = re.search(r".*-\n(.*)\n\n", conn_info, re.DOTALL).group(1)
+        conn_info = matched.group(1)
         conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                               r"(?P<src_name>.*?)[ ]{2,}"
                               r".*?[ ]{2,}"  # src Rx Pwr(dBm)

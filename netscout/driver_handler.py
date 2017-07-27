@@ -14,7 +14,6 @@ class NetscoutDriverHandler(DriverHandlerBase):
     RX_SUBPORT_INDEX = 'RX'
 
     GENERIC_ERRORS = OrderedDict([
-        ("[Ee]rror|ERROR", "Error during command execution"),
         ("[Ii]nvalid", "Command is invalid"),
         ("[Nn]ot [Ll]ogged", "User is not logged in"),
         ("(?<![R|r]ead) error", "Failed to perform command"),
@@ -339,6 +338,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
             ("[Nn]ot compatible", "Ports\Subports not compatible"),
+            ("[Ee]rror|ERROR", "Error during command execution"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
@@ -357,6 +357,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
             ("[Nn]ot compatible", "Ports\Subports not compatible"),
+            ("[Ee]rror|ERROR", "Error during command execution"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)

@@ -36,7 +36,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         address_data = re.search(
             r"(?P<host>[^:]*)"
             r":?(?P<port>[0-9]*?)"
-            r"\?testtream=(?P<switch_name>.*)",
+            r"\?teststream=(?P<switch_name>.*)",
             address,
             re.IGNORECASE)
 

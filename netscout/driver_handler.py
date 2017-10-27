@@ -28,15 +28,15 @@ class NetscoutDriverHandler(DriverHandlerBase):
         """Perform login operation on the device
 
         :param address: (str) address in the format <host>:<port>?Horizon=<switch_name> (port is optional)
-        :param username: (str) username for horizon
-        :param password: (str) password for horizon
+        :param username: (str) username for testtream
+        :param password: (str) password for testtream
         :param command_logger: logging.Logger instance
         :return: None
         """
         address_data = re.search(
             r"(?P<host>[^:]*)"
             r":?(?P<port>[0-9]*?)"
-            r"\?horizon=(?P<switch_name>.*)",
+            r"\?testtream=(?P<switch_name>.*)",
             address,
             re.IGNORECASE)
 

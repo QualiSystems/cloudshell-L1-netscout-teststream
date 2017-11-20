@@ -315,6 +315,28 @@
           </ParentModels>
           <Drivers />
         </ResourceModel>
+        <ResourceModel Name="Port T-BLADE" SupportsConcurrentCommands="false">
+          <AttachedAttributes>
+            <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>2</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+            <AttachedAttribute Name="Protocol Type" IsOverridable="true" IsLocal="false">
+              <AllowedValues>
+                <AllowedValue>0</AllowedValue>
+              </AllowedValues>
+            </AttachedAttribute>
+          </AttachedAttributes>
+          <AttributeValues>
+            <AttributeValue Name="Protocol" Value="2" />
+            <AttributeValue Name="Protocol Type" Value="0" />
+          </AttributeValues>
+          <ParentModels>
+            <ParentModelName>T-BLADE</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
       </Models>
     </ResourceFamily>
     <ResourceFamily Name="L1 Switch Chassis Controller" IsMappableContainer="false" IsMappable="false" IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false" IsLockedByDefault="false" AcceptsMultipleConnections="false" Description="" SupportsMulticastMapping="false" SupportsLoopbackMapping="false" IsPowerSwitch="false" IsConsoleServer="false" ResourceType="Resource" Searchable="true">
@@ -354,6 +376,14 @@
           <Drivers />
         </ResourceModel>
         <ResourceModel Name="S-BLADE-PRO" Description="" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues />
+          <ParentModels>
+            <ParentModelName>NetScout Switch 390x Chassis Controller</ParentModelName>
+          </ParentModels>
+          <Drivers />
+        </ResourceModel>
+        <ResourceModel Name="T-BLADE" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>

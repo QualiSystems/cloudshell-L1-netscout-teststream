@@ -33,9 +33,9 @@ VSVersionInfo(
         StringStruct(u'ProductName', u'L1 Driver'),
         StringStruct(u'ProductVersion', u'1.0.1.0'),
         StringStruct(u'InternalName', u'L1 Driver'),
-        StringStruct(u'OriginalFilename', u'Netscout.exe'),
+        StringStruct(u'OriginalFilename', u'NetScout_TestStream.exe'),
         StringStruct(u'FileVersion', u'96, 12, 19, 1'),
-        StringStruct(u'FileDescription', u'Netscout driver'),
+        StringStruct(u'FileDescription', u'NetScout TestStream driver'),
         StringStruct(u'LegalCopyright', u'Copyright 2016 Quali, Inc.'),
         StringStruct(u'LegalTrademarks', u'Quali, Inc.'),])
       ]),

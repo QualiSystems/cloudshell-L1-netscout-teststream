@@ -10,6 +10,7 @@ from common.resource_info import ResourceInfo
 
 
 class NetscoutDriverHandler(DriverHandlerBase):
+    BLADE_MAPPING = {}
     TX_SUBPORT_INDEX = 'TX'
     RX_SUBPORT_INDEX = 'RX'
 
@@ -153,6 +154,23 @@ class NetscoutDriverHandler(DriverHandlerBase):
                                        "Connection info: {}".format(conn_data))
         return mapping_info
 
+    def _get_blade_mapping(self):
+
+        device_info = self._disp_switch_info()
+        info_match = re.search(r"SWITCH COMPONENTS(?P<switch_components>.*)", device_info, re.DOTALL)
+        info_list = info_match.group("switch_components").split("\n")
+
+        for info_str in info_list:
+            if info_str.lower().startswith("chassis"):
+                chassis_no = "{0:0>2}".format(int(re.search(r"(\d+):", info_str).group(1)))
+            elif info_str.startswith(" " * 4):
+                pass
+            elif info_str.startswith(" " * 2):
+                blade_base_info = re.search(r"(?P<blade_id>\d+)\s+(?P<model>.*)", info_str)
+                blade_type = blade_base_info.group("model").strip().replace(" ", "-").upper()
+                blade_no = "{0:0>2}".format(int(blade_base_info.group("blade_id")))
+                self.BLADE_MAPPING["{chassis}.{blade}".format(chassis=chassis_no, blade=blade_no)] = blade_type
+
     def get_resource_description(self, address, command_logger):
         """Auto-load function to retrieve all information from the device
 
@@ -160,6 +178,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: common.resource_info.ResourceInfo instance with all switch sub-resources (chassis, blades, ports)
         """
+
         depth = 0
         resource_info = ResourceInfo()
         resource_info.set_depth(depth)
@@ -216,13 +235,18 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
             elif info_str.startswith(" " * 4):
                 # add ports
+
                 blade_info = re.search(
-                    r"(?P<model>.*?)\s{2,}(?P<uboot_rev>.*?)\s{2,}(?P<serial_number>.*?)(\s{2,}|$)",
-                    info_str.strip(),
-                    re.DOTALL)
+                    r"(?P<vendor>.*),(?P<model>.*),(?P<uboot_rev>.*),(?P<serial_number>.*)", info_str, re.DOTALL)
+
+                if not blade_info:
+                    blade_info = re.search(
+                        r"(?P<model>.*?)\s{2,}(?P<uboot_rev>.*?)\s{2,}(?P<serial_number>.*?)(\s{2,}|$)",
+                        info_str.strip(),
+                        re.DOTALL)
 
                 # blade_resource.add_attribute("Vendor", blade_info.group("vendor"))
-                blade_type = blade_info.group("model")
+                # blade_type = blade_info.group("model").replace(" ", "-").upper()
                 blade_resource.set_model_name(blade_type)
                 # blade_resource.add_attribute("Model", blade_info.group("model"))
                 blade_resource.add_attribute("Uboot Rev.", blade_info.group("uboot_rev"))
@@ -269,11 +293,15 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
             elif info_str.startswith(" " * 2):
                 # blade type is the last word in the sequence
-                # blade_type = info_str.rstrip().rsplit(' ')[-1]
-                blade_no = int(re.search(r"(\d+)", info_str).group(1))
+                blade_base_info = re.search(r"(?P<blade_id>\d+)\s+(?P<model>.*)", info_str)
+
+                blade_type = blade_base_info.group("model").strip().replace(" ", "-").upper()
+                blade_no = int(blade_base_info.group("blade_id"))
+
+                self.BLADE_MAPPING["{0:0>2}.{0:0>2}".format(chassis_no, blade_no)] = blade_type
 
                 blade_resource = ResourceInfo()
-                # blade_resource.set_model_name(blade_type)
+                blade_resource.set_model_name(blade_type)
                 blade_resource.set_depth(depth + 2)
                 blade_resource.set_index(str(blade_no))
                 chassis_resource.add_child(info_str, blade_resource)
@@ -326,6 +354,12 @@ class NetscoutDriverHandler(DriverHandlerBase):
         error_map.update(self.GENERIC_ERRORS)
         self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
+    def _is_t_blade(self, port):
+        blade_path = ".".join(port.split(".")[:-1])
+        if self.BLADE_MAPPING.get(blade_path) == "T-BLADE":
+            return True
+        return False
+
     def _con_simplex(self, src_port, dst_port, command_logger):
         """Perform simplex connection between source and destination ports
 
@@ -334,7 +368,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: (str) output for the connect command from the device
         """
-        command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
+
+        if self._is_t_blade(src_port):
+            command = "CONNECT -s -F PRTNUM {} PRTNUM {}".format(src_port, dst_port)
+        else:
+            command = "connect simplex prtnum {} to {} force".format(src_port, dst_port)
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
             ("[Nn]ot compatible", "Ports\Subports not compatible"),
@@ -351,6 +389,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: (str) output for the connect command from the device
         """
+
         if not self.is_logical_port_mode:
             raise Exception("Bidirectional port mapping could be done only in logical port_mode "
                             "current mode: {}".format(self._port_mode))
@@ -360,7 +399,12 @@ class NetscoutDriverHandler(DriverHandlerBase):
             ("[Ee]rror|ERROR", "Error during command execution"),
         ])
         error_map.update(self.GENERIC_ERRORS)
-        command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
+
+        if self._is_t_blade(src_port):
+            command = "CONNECT -d -F PRTNUM {} PRTNUM {}".format(src_port, dst_port)
+        else:
+            command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
+
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
 
     def _discon_simplex(self, src_port, dst_port, command_logger):
@@ -371,7 +415,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: (str) output for the disconnect command from the device
         """
-        command = "disconnect simplex {} force".format(dst_port)
+
+        if self._is_t_blade(src_port):
+            command = "DISCONNECT -s -F PRTNUM {} PRTNUM {}".format(src_port, dst_port)
+        else:
+            command = "disconnect simplex {} force".format(dst_port)
         error_map = OrderedDict([
             ("[Nn]ot [Ss]implex", "Subport is not simplex connected"),
         ])
@@ -386,7 +434,11 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: (str) output for the disconnect command from the device
         """
-        command = "disconnect duplex prtnum {} force".format(dst_port)
+
+        if self._is_t_blade(src_port):
+            command = "DISCONNECT -d -F PRTNUM {} PRTNUM {}".format(src_port, dst_port)
+        else:
+            command = "disconnect duplex prtnum {} force".format(dst_port)
         return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def _discon_multi(self, src_port, dst_port, command_logger):
@@ -397,7 +449,9 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: (str) output for the disconnect command from the device
         """
+
         command = "disconnect multicast destination {} force".format(dst_port)
+        # command = "DISCONNECT -d -F PRTNUM {} PRTNUM {}".format(src_port, dst_port)
         return self._session.send_command(command, re_string=self._prompt, error_map=self.GENERIC_ERRORS)
 
     def _show_port_connection(self, port):
@@ -453,6 +507,10 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: None
         """
+
+        if not self.BLADE_MAPPING:
+            self._get_blade_mapping()
+
         src_port_name, dst_port_name = self._convert_port_names(src_port, dst_port)
         self._select_switch(command_logger=command_logger)
         self._con_duplex(src_port_name, dst_port_name, command_logger)
@@ -465,6 +523,10 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: None
         """
+
+        if not self.BLADE_MAPPING:
+            self._get_blade_mapping()
+
         if not self.is_logical_port_mode:
             src_port[-1] = self._validate_tx_subport(src_port[-1])
             dst_port[-1] = self._validate_rx_subport(dst_port[-1])
@@ -481,6 +543,10 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: None
         """
+
+        if not self.BLADE_MAPPING:
+            self._get_blade_mapping()
+
         if not self.is_logical_port_mode:
             src_port[-1] = self._validate_tx_subport(src_port[-1])
             dst_port[-1] = self._validate_rx_subport(dst_port[-1])
@@ -531,6 +597,10 @@ class NetscoutDriverHandler(DriverHandlerBase):
         :param command_logger: logging.Logger instance
         :return: None
         """
+
+        if not self.BLADE_MAPPING:
+            self._get_blade_mapping()
+
         self.map_clear_to(src_port, dst_port, command_logger)
 
     def set_speed_manual(self, command_logger):

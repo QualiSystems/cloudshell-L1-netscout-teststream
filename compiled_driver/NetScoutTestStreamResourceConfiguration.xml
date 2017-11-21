@@ -210,6 +210,17 @@
         <AttributeValue Name="Password" Value="" />
       </AttributeValues>
       <Models>
+        <ResourceModel Name="OS-192" Description="NetScout OS-192 Driver" SupportsConcurrentCommands="false">
+          <AttachedAttributes />
+          <AttributeValues>
+            <AttributeValue Name="User" Value="" />
+            <AttributeValue Name="Password" Value="" />
+          </AttributeValues>
+          <ParentModels />
+          <Drivers>
+            <DriverName>NetScout 390x Driver</DriverName>
+          </Drivers>
+        </ResourceModel>
         <ResourceModel Name="3900" Description="NetScout 3900 Driver" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues>
@@ -347,6 +358,7 @@
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
+            <ParentModelName>OS-192</ParentModelName>
             <ParentModelName>3900</ParentModelName>
             <ParentModelName>3901</ParentModelName>
             <ParentModelName>3903</ParentModelName>

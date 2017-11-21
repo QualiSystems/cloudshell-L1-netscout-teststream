@@ -28,7 +28,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
     def login(self, address, username, password, command_logger):
         """Perform login operation on the device
 
-        :param address: (str) address in the format <host>:<port>?Horizon=<switch_name> (port is optional)
+        :param address: (str) address in the format <host>:<port>?TestStream=<switch_name> (port is optional)
         :param username: (str) username for testtream
         :param password: (str) password for testtream
         :param command_logger: logging.Logger instance
@@ -174,7 +174,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
     def get_resource_description(self, address, command_logger):
         """Auto-load function to retrieve all information from the device
 
-        :param address: (str) address in the format <host>:<port>?Horizon=<switch_name> (port is optional)
+        :param address: (str) address in the format <host>:<port>?TestStream=<switch_name> (port is optional)
         :param command_logger: logging.Logger instance
         :return: common.resource_info.ResourceInfo instance with all switch sub-resources (chassis, blades, ports)
         """

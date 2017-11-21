@@ -218,7 +218,7 @@
           </AttributeValues>
           <ParentModels />
           <Drivers>
-            <DriverName>NetScout 390x Driver</DriverName>
+            <DriverName>NetScout TestStream 390x Driver</DriverName>
           </Drivers>
         </ResourceModel>
         <ResourceModel Name="3900" Description="NetScout 3900 Driver" SupportsConcurrentCommands="false">
@@ -229,7 +229,7 @@
           </AttributeValues>
           <ParentModels />
           <Drivers>
-            <DriverName>NetScout 390x Driver</DriverName>
+            <DriverName>NetScout TestStream 390x Driver</DriverName>
           </Drivers>
         </ResourceModel>
         <ResourceModel Name="3901" Description="NetScout 3901 Driver" SupportsConcurrentCommands="false">
@@ -240,7 +240,7 @@
           </AttributeValues>
           <ParentModels />
           <Drivers>
-            <DriverName>NetScout 390x Driver</DriverName>
+            <DriverName>NetScout TestStream 390x Driver</DriverName>
           </Drivers>
         </ResourceModel>
         <ResourceModel Name="3903" Description="NetScout 3903 Driver" SupportsConcurrentCommands="false">
@@ -251,7 +251,7 @@
           </AttributeValues>
           <ParentModels />
           <Drivers>
-            <DriverName>NetScout 390x Driver</DriverName>
+            <DriverName>NetScout TestStream 390x Driver</DriverName>
           </Drivers>
         </ResourceModel>
       </Models>
@@ -407,6 +407,6 @@
     </ResourceFamily>
   </ResourceFamilies>
   <DriverDescriptors>
-    <DriverDescriptor Name="NetScout 390x Driver" DriverType="L1SwitchTclDriver" CustomParams="NetScout_TestStream.exe" />
+    <DriverDescriptor Name="NetScout TestStream 390x Driver" DriverType="L1SwitchTclDriver" CustomParams="NetScout_TestStream.exe" />
   </DriverDescriptors>
 </ResourceManagementExportImport>

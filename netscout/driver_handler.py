@@ -45,6 +45,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         port = address_data.group("port")
         port = int(port) if port else None
 
+        self._session.logger = command_logger
         self._session.connect(host, username, password, port, re_string=self._prompt)
         command = 'logon {} {}'.format(username, password)
         error_map = OrderedDict([
@@ -376,7 +377,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
             ("[Nn]ot compatible", "Ports\Subports not compatible"),
-            ("[Ee]rror|ERROR", "Error during command execution"),
+            ("[Ee]rror|ERROR", "Error during command execution. See logs for more details"),
         ])
         error_map.update(self.GENERIC_ERRORS)
         return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
@@ -396,7 +397,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         error_map = OrderedDict([
             ("[Nn]ot [Ff]ound", "Subport was not found"),
             ("[Nn]ot compatible", "Ports\Subports not compatible"),
-            ("[Ee]rror|ERROR", "Error during command execution"),
+            ("[Ee]rror|ERROR", "Error during command execution. See logs for more details"),
         ])
         error_map.update(self.GENERIC_ERRORS)
 

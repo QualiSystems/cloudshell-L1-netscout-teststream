@@ -129,7 +129,7 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         switch_name = 'test_switch_name'
         username = "test_username"
         password = "test_password"
-        address = "{}?Horizon={}".format(host, switch_name)
+        address = "{}?TestStream={}".format(host, switch_name)
         port = None
 
         self.tested_instance.login(address=address, username=username, password=password, command_logger=logger)
@@ -152,7 +152,7 @@ class TestNetscoutDriverHandler(unittest.TestCase):
         switch_name = 'test_switch_name'
         username = "test_username"
         password = "test_password"
-        address = "{}:{}?Horizon={}".format(host, port, switch_name)
+        address = "{}:{}?TestStream={}".format(host, port, switch_name)
 
         self.tested_instance.login(address=address, username=username, password=password, command_logger=logger)
         self.tested_instance._session.connect.assert_called_once_with(

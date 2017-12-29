@@ -16,7 +16,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
     GENERIC_ERRORS = OrderedDict([
         ("[Ii]nvalid", "Command is invalid"),
-        ("[Nn]ot [Ll]ogged", "User is not logged in"),
+        # ("[Nn]ot [Ll]ogged", "User is not logged in"),
         ("(?<![R|r]ead) error", "Failed to perform command"),
     ])
 
@@ -24,6 +24,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
         DriverHandlerBase.__init__(self)
         self._port_mode = ConfigurationParser.get("driver_variable", "port_mode")
         self._switch_name = None
+        self.model_name = None
         self._software_version = None
         self._is_new_commands_format = None
 
@@ -75,8 +76,21 @@ class NetscoutDriverHandler(DriverHandlerBase):
 
     @property
     def is_logical_port_mode(self):
-        """Returns True if port is "logical" model, otherwise returns False"""
-        return self._port_mode.lower() == "logical"
+        """Returns True if port is "logical" model and switch model like OS-\d+, otherwise returns False"""
+
+        if not self.model_name:
+            device_info = self._disp_switch_info()
+
+            info_match = re.search(
+                r"PHYSICAL INFORMATION(?P<physical_info>.*)"
+                r"SWITCH COMPONENTS(?P<switch_components>.*)",
+                device_info, re.DOTALL)
+
+            self.model_name = re.search(r"Switch Model:[ ]*(.*?)\n",
+                                        info_match.group("physical_info"),
+                                        re.DOTALL).group(1)
+
+        return self._port_mode.lower() == "logical" and not re.match(r"OS-\d+", self.model_name, re.IGNORECASE)
 
     def _disp_switch_info(self):
         """Execute display switch info command on the device
@@ -197,9 +211,9 @@ class NetscoutDriverHandler(DriverHandlerBase):
             r"SWITCH COMPONENTS(?P<switch_components>.*)",
             device_info, re.DOTALL)
 
-        model_name = re.search(r"Switch Model:[ ]*(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
-        resource_info.set_model_name(model_name)
-        resource_info.set_index(model_name)
+        self.model_name = re.search(r"Switch Model:[ ]*(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
+        resource_info.set_model_name(self.model_name)
+        resource_info.set_index(self.model_name)
         ip_addr = re.search(r"IP Address:[ ]*(.*?)\n", info_match.group("physical_info"), re.DOTALL).group(1)
         resource_info.add_attribute("Switch Address", ip_addr)
 
@@ -207,7 +221,6 @@ class NetscoutDriverHandler(DriverHandlerBase):
             self._software_version = self._get_software_version()
 
         resource_info.add_attribute("Software Version", self._software_version)
-
 
         info_list = info_match.group("switch_components").split("\n")
 

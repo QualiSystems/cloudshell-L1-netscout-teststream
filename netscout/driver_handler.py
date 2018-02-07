@@ -322,7 +322,7 @@ class NetscoutDriverHandler(DriverHandlerBase):
                 # blade type is the last word in the sequence
                 blade_base_info = re.search(r"(?P<blade_id>\d+)\s+(?P<model>.*)", info_str)
 
-                blade_type = blade_base_info.group("model").strip().replace(" ", "-").upper()
+                blade_type = blade_base_info.group("model").strip().replace(" ", "-").title()
                 blade_no = int(blade_base_info.group("blade_id"))
 
                 blade_resource = ResourceInfo()

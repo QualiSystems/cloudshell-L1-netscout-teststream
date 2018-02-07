@@ -271,7 +271,7 @@
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="Port O-BLADE" SupportsConcurrentCommands="false">
+        <ResourceModel Name="Port O-Blade" SupportsConcurrentCommands="false">
           <AttachedAttributes>
             <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
               <AllowedValues>
@@ -289,11 +289,11 @@
             <AttributeValue Name="Protocol Type" Value="0" />
           </AttributeValues>
           <ParentModels>
-            <ParentModelName>O-BLADE</ParentModelName>
+            <ParentModelName>O-Blade</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="Port S-BLADE" SupportsConcurrentCommands="false">
+        <ResourceModel Name="Port S-Blade" SupportsConcurrentCommands="false">
           <AttachedAttributes>
             <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
               <AllowedValues>
@@ -311,11 +311,11 @@
             <AttributeValue Name="Protocol Type" Value="0" />
           </AttributeValues>
           <ParentModels>
-            <ParentModelName>S-BLADE</ParentModelName>
+            <ParentModelName>S-Blade</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="Port S-BLADE-PRO" SupportsConcurrentCommands="false">
+        <ResourceModel Name="Port S-Blade-Pro" SupportsConcurrentCommands="false">
           <AttachedAttributes>
             <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
               <AllowedValues>
@@ -333,11 +333,11 @@
             <AttributeValue Name="Protocol Type" Value="0" />
           </AttributeValues>
           <ParentModels>
-            <ParentModelName>S-BLADE-PRO</ParentModelName>
+            <ParentModelName>S-Blade-Pro</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="Port T-BLADE" SupportsConcurrentCommands="false">
+        <ResourceModel Name="Port T-Blade" SupportsConcurrentCommands="false">
           <AttachedAttributes>
             <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
               <AllowedValues>
@@ -355,7 +355,7 @@
             <AttributeValue Name="Protocol Type" Value="0" />
           </AttributeValues>
           <ParentModels>
-            <ParentModelName>T-BLADE</ParentModelName>
+            <ParentModelName>T-Blade</ParentModelName>
           </ParentModels>
           <Drivers />
         </ResourceModel>
@@ -383,7 +383,7 @@
       <AttachedAttributes />
       <AttributeValues />
       <Models>
-        <ResourceModel Name="O-BLADE" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="O-Blade" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
@@ -391,7 +391,7 @@
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="S-BLADE" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="S-Blade" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
@@ -399,7 +399,7 @@
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="S-BLADE-PRO" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="S-Blade-Pro" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>
@@ -407,7 +407,7 @@
           </ParentModels>
           <Drivers />
         </ResourceModel>
-        <ResourceModel Name="T-BLADE" Description="" SupportsConcurrentCommands="false">
+        <ResourceModel Name="T-Blade" Description="" SupportsConcurrentCommands="false">
           <AttachedAttributes />
           <AttributeValues />
           <ParentModels>

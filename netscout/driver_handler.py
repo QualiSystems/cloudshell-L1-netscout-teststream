@@ -58,10 +58,14 @@ class NetscoutDriverHandler(DriverHandlerBase):
         ])
         error_map.update(self.GENERIC_ERRORS)
 
+        action_map = OrderedDict()
+        action_map['Accept/Decline'] = lambda session: session.send_line("A")
+
         self._session.logger = command_logger
         self._session.connect(host, username, password,
                               command=command,
                               error_map=error_map,
+                              action_map=action_map,
                               port=port,
                               re_string=self._prompt)
 

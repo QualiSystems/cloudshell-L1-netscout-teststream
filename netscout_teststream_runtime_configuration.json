@@ -1,7 +1,11 @@
 {
-  "driver_variable": {
+  "common_variable": {
+    "connection_type": "tcp",
     "connection_port": 53058,
-    "port_mode": "logical",
-    "server_timeout": 20
+    "device_prompt": "=>",
+    "server_timeout": 10
+  },
+  "driver_variable": {
+    "port_mode": "logical"
   }
 }

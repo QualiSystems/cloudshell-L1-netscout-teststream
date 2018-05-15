@@ -13,7 +13,7 @@ class NetscoutSSHSession(SSHSession):
         error_map.update(GENERIC_ERRORS)
 
         action_map = OrderedDict()
-        action_map['Accept/Decline'] = lambda session: session.send_line("A")
+        action_map['Accept/Decline'] = lambda session, logger: session.send_line("A", logger)
 
         prompt = DefaultCommandMode.PROMPT
         self.hardware_expect(None, expected_string=prompt, timeout=self._timeout, logger=logger,

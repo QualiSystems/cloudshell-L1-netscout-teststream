@@ -13,9 +13,12 @@ class NetscoutTelnetSession(TelnetSession):
         ])
         error_map.update(GENERIC_ERRORS)
         action_map = OrderedDict()
-        action_map['Accept/Decline'] = lambda session: session.send_line("A")
+        action_map['Accept/Decline'] = lambda session, logger: session.send_line("A", logger)
 
         prompt = DefaultCommandMode.PROMPT
+
+        self.hardware_expect('', expected_string=prompt, timeout=self._timeout, logger=logger,
+                             action_map=action_map, error_map=error_map)
 
         self.hardware_expect(command, expected_string=prompt, timeout=self._timeout, logger=logger,
                              action_map=action_map, error_map=error_map)

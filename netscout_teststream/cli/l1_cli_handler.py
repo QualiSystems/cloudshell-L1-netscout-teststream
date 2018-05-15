@@ -3,17 +3,17 @@
 
 from cloudshell.cli.cli import CLI
 from cloudshell.cli.session.ssh_session import SSHSession
+from cloudshell.cli.session.telnet_session import TelnetSession
 from cloudshell.cli.session_pool_manager import SessionPoolManager
 from cloudshell.layer_one.core.helper.runtime_configuration import RuntimeConfiguration
 from cloudshell.layer_one.core.layer_one_driver_exception import LayerOneDriverException
-from netscout_teststream.cli.netscout_telnet_session import NetscoutTelnetSession
 
 
 class L1CliHandler(object):
     def __init__(self, logger):
         self._logger = logger
         self._cli = CLI(session_pool=SessionPoolManager(max_pool_size=1))
-        self._defined_session_types = {'SSH': SSHSession, 'TELNET': NetscoutTelnetSession}
+        self._defined_session_types = {'SSH': SSHSession, 'TELNET': TelnetSession}
 
         self._session_types = RuntimeConfiguration().read_key(
             'CLI.TYPE') or self._defined_session_types.keys()

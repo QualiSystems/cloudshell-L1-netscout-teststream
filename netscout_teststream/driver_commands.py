@@ -10,13 +10,28 @@ from cloudshell.layer_one.core.response.resource_info.entities.blade import Blad
 from cloudshell.layer_one.core.response.resource_info.entities.port import Port
 from cloudshell.layer_one.core.response.response_info import ResourceDescriptionResponseInfo
 from netscout_teststream.cli.netscout_cli_handler import NetscoutCliHandler
+from netscout_teststream.cli.simulator.cli_simulator import CLISimulator
+from netscout_teststream.command_actions.autoload_actions import AutoloadActions
 from netscout_teststream.command_actions.system_actions import SystemActions
+from netscout_teststream.model.hs_bank import HSBank
+from netscout_teststream.model.o_blade import OBlade
+from netscout_teststream.model.s_blade import SBlade
+from netscout_teststream.model.s_blade_pro import SBladePro
+from netscout_teststream.model.t_blade import TBlade
 
 
 class DriverCommands(DriverCommandsInterface):
     """
     Driver commands implementation
     """
+    REGISTERED_BLADES = {
+        OBlade.MODEL_NAME.lower(): OBlade,
+        HSBank.MODEL_NAME.lower(): HSBank,
+        SBlade.MODEL_NAME.lower(): SBlade,
+        SBladePro.MODEL_NAME.lower(): SBladePro,
+        TBlade.MODEL_NAME.lower(): TBlade
+
+    }
 
     def __init__(self, logger):
         """
@@ -24,7 +39,10 @@ class DriverCommands(DriverCommandsInterface):
         :type logger: logging.Logger
         """
         self._logger = logger
-        self._cli_handler = NetscoutCliHandler(logger)
+        # self._cli_handler = NetscoutCliHandler(logger)
+        self._cli_handler = CLISimulator(
+            '/Users/yar/Projects/Quali/Github/LayerOne/cloudshell-L1-netscout-teststream/netscout_teststream/cli/simulator/data',
+            logger)
         self._switch_name = None
 
     def login(self, address, username, password):
@@ -64,12 +82,15 @@ class DriverCommands(DriverCommandsInterface):
 
         self._switch_name = address_data.group("switch_name")
 
-        self._logger.debug('Switch: ' + self._switch_name)
+        self._logger.debug('Defined switch: ' + self._switch_name)
 
         self._cli_handler.define_session_attributes(host, username, password, port)
         with self._cli_handler.default_mode_service() as session:
-            system_actions = SystemActions(session, self._logger)
-            self._logger.info(system_actions.show_switches())
+            system_actions = SystemActions(self._switch_name, session, self._logger)
+            available_switches = system_actions.available_switches()
+            self._logger.debug('Available Switches: ' + ", ".join(available_switches))
+            if self._switch_name.lower() not in map(lambda x: x.lower(), available_switches):
+                raise Exception('Switch {} is not available'.format(self._switch_name))
 
     def get_state_id(self):
         """
@@ -173,26 +194,47 @@ class DriverCommands(DriverCommandsInterface):
 
         return ResourceDescriptionResponseInfo([chassis])
         """
+        with self._cli_handler.default_mode_service() as session:
+            chassis_dict = {}
+            autoload_actions = AutoloadActions(self._switch_name, session, self._logger)
+            switch_model_name = autoload_actions.switch_model_name()
+            software_version = autoload_actions.software_version()
+            switch_address = autoload_actions.switch_ip_addr()
+            ports_table = autoload_actions.ports_table()
+            blades_dict = {}
+            for chassis_id, chassis_data in autoload_actions.chassis_table().iteritems():
+                chassis = Chassis(chassis_id, switch_address, 'Netscout Teststream Chassis', None)
+                chassis.set_model_name(switch_model_name)
+                chassis.set_os_version(software_version)
+                chassis_dict[chassis_id] = chassis
+                blades_dict = self._build_blades(chassis_id, chassis, chassis_data)
+            self._build_ports(blades_dict, ports_table)
+        return ResourceDescriptionResponseInfo(chassis_dict.values())
 
-        chassis_resource_id = 1
-        chassis_model_name = "Netscout Teststream Chassis"
-        chassis_serial_number = 'NA'
-        chassis = Chassis(chassis_resource_id, address, chassis_model_name, chassis_serial_number)
+    def _build_blades(self, chassis_id, chassis, chassis_data):
+        blades_dict = {}
+        for blade_id, blade_data in chassis_data.iteritems():
+            blade_type = blade_data.get('blade_type')
+            blade_class = self.REGISTERED_BLADES.get(blade_type.lower())
+            if not blade_class:
+                raise Exception(self.__class__.__name__, 'Blade type {} is not registered'.format(blade_type))
+            model_name = blade_data.get('model')
+            serial_number = blade_data.get('serial_number')
+            blade_instance = blade_class(blade_id)
+            blade_instance.set_model_name(model_name)
+            blade_instance.set_serial_number(serial_number)
+            blade_instance.set_parent_resource(chassis)
+            blades_dict[(chassis_id, blade_id)] = blade_instance
+        return blades_dict
 
-        blade1 = Blade('1')
-        blade1.set_parent_resource(chassis)
-        blade2 = Blade('2')
-        blade2.set_parent_resource(chassis)
-
-        for port_id in range(1, 11):
-            port = Port(port_id)
-            port.set_parent_resource(blade1)
-
-        for port_id in range(1, 11):
-            port = Port(port_id)
-            port.set_parent_resource(blade2)
-
-        return ResourceDescriptionResponseInfo([chassis])
+    def _build_ports(self, blades_dict, ports_table):
+        for address, port_data in ports_table.iteritems():
+            chassis_id, blade_id, port_id = address.split('.')
+            blade = blades_dict.get((int(chassis_id), int(blade_id)))
+            if blade:
+                port = Port(port_id)
+                port.set_parent_resource(blade)
+                port.set_model_name(port_data.get('name'))
 
     def map_clear(self, ports):
         """

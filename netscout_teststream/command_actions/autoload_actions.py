@@ -47,14 +47,6 @@ class AutoloadActions(object):
     def switch_ip_addr(self):
         return re.search(r"IP Address:[ ]*(.*?)\n", self._switch_info_table[self.SW_INFORM], re.DOTALL).group(1)
 
-    def software_version(self):
-        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_STATUS).execute_command()
-        match = re.search(r"Version[ ]?(.*?)\n", output, re.DOTALL)
-        if match:
-            return match.group(1)
-        else:
-            raise Exception(self.__class__.__name__, "Can not determine Software Version.")
-
     def chassis_table(self):
         controller_ids = re.findall(r'chassis\scontroller\s(\d+):', self._switch_info_table[self.SW_COMPONENTS],
                                     flags=re.IGNORECASE | re.DOTALL)
@@ -88,7 +80,7 @@ class AutoloadActions(object):
             blade_dict[blade_id]['blade_type'] = blade_type
         return blade_dict
 
-    def ports_table(self):
+    def port_table(self):
         output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_PORTS).execute_command(
             switch_name=self._switch_name)
         ports = {}
@@ -104,3 +96,46 @@ class AutoloadActions(object):
 
             ports[info.group("phys_addr")] = info.groupdict()
         return ports
+
+    def mapping_table(self):
+        """Get mappings for all multi-cast/simplex/duplex port connections
+
+        :param command_logger: logging.Logger instance
+        :return: (dictionary) destination sub-port => source sub-port
+        """
+        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_CONNECTIONS).execute_command(
+            switch_name=self._switch_name)
+        mapping_info = {}
+
+        if "connection not found" in output.lower():
+            return mapping_info
+
+        connections_list = re.search(r".*-\n(.*)\n\n", output, re.DOTALL)
+        if connections_list is None:
+            return mapping_info
+        else:
+            connections_list = connections_list.group(1).split('\n')
+        for conn_info in connections_list:
+            conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
+                                  r"(?P<src_name>.*?)[ ]{2,}"
+                                  r".*?[ ]{2,}"  # src Rx Pwr(dBm)
+                                  r"(?P<connection_type>.*?)[ ]{2,}"
+                                  r"(?P<dst_addr>.*?)[ ]{2,}"
+                                  r"(?P<dst_name>.*?)[ ]{2,}"
+                                  r".*?[ ]{2,}"  # dst Rx Pwr(dBm)
+                                  r"(?P<speed>.*)"
+                                  r"(?P<protocol>.*)",
+                                  conn_info)
+            conn_type = conn_data.group('connection_type').lower()
+            src = conn_data.group('src_addr')
+            dst = conn_data.group('dst_addr')
+
+            if conn_type in ('simplex', 'mcast'):
+                mapping_info[dst] = src
+            elif conn_type == 'duplex':
+                mapping_info[dst] = src
+                mapping_info[src] = dst
+            else:
+                self._logger.warning("Can't set mapping for unhandled connection type. "
+                                       "Connection info: {}".format(conn_data))
+        return mapping_info

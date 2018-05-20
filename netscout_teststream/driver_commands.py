@@ -1,35 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
+
 from cloudshell.layer_one.core.driver_commands_interface import DriverCommandsInterface
-from cloudshell.layer_one.core.response.response_info import GetStateIdResponseInfo
 from cloudshell.layer_one.core.response.resource_info.entities.chassis import Chassis
 from cloudshell.layer_one.core.response.resource_info.entities.port import Port
+from cloudshell.layer_one.core.response.response_info import GetStateIdResponseInfo
 from cloudshell.layer_one.core.response.response_info import ResourceDescriptionResponseInfo
-from netscout_teststream.cli.netscout_cli_handler import NetscoutCliHandler
 from netscout_teststream.cli.simulator.cli_simulator import CLISimulator
-from netscout_teststream.command_actions.autoload_actions import AutoloadActions
+from netscout_teststream.command_actions.autoload_actions import AutoloadActions, PortKeys
 from netscout_teststream.command_actions.mapping_actions import MappingActions
 from netscout_teststream.command_actions.system_actions import SystemActions
-from netscout_teststream.model.hs_bank import HSBank
-from netscout_teststream.model.o_blade import OBlade
-from netscout_teststream.model.s_blade import SBlade
-from netscout_teststream.model.s_blade_pro import SBladePro
-from netscout_teststream.model.t_blade import TBlade
+from netscout_teststream.model.netscout_blade import NetscoutBlade
 
 
 class DriverCommands(DriverCommandsInterface):
     """
     Driver commands implementation
     """
-    REGISTERED_BLADES = {
-        OBlade.MODEL_NAME.lower(): OBlade,
-        HSBank.MODEL_NAME.lower(): HSBank,
-        SBlade.MODEL_NAME.lower(): SBlade,
-        SBladePro.MODEL_NAME.lower(): SBladePro,
-        TBlade.MODEL_NAME.lower(): TBlade
-
-    }
 
     NEW_MAJOR_VERSION = 3
 
@@ -243,16 +231,13 @@ class DriverCommands(DriverCommandsInterface):
     def _build_blades(self, chassis_id, chassis, chassis_data):
         self._logger.debug('Build Blades')
         blades_dict = {}
-        for blade_id, blade_data in chassis_data.iteritems():
-            blade_type = blade_data.get('blade_type')
-            blade_class = self.REGISTERED_BLADES.get(blade_type.lower())
-            if not blade_class:
-                raise Exception(self.__class__.__name__, 'Blade type {} is not registered'.format(blade_type))
-            model_name = blade_data.get('model')
-            serial_number = blade_data.get('serial_number')
-            blade_instance = blade_class(blade_id)
-            blade_instance.set_model_name(model_name)
-            blade_instance.set_serial_number(serial_number)
+        for blade_id, blade_type in chassis_data.iteritems():
+            # blade_type = blade_data.get('blade_type')
+            # model_name = blade_data.get('model')
+            # serial_number = blade_data.get('serial_number')
+            blade_instance = NetscoutBlade(blade_id, blade_type)
+            # blade_instance.set_model_name(model_name)
+            # blade_instance.set_serial_number(serial_number)
             blade_instance.set_parent_resource(chassis)
             blades_dict[(chassis_id, blade_id)] = blade_instance
         return blades_dict
@@ -266,7 +251,7 @@ class DriverCommands(DriverCommandsInterface):
             if blade:
                 port = Port(port_id)
                 port.set_parent_resource(blade)
-                port.set_model_name(port_data.get('name'))
+                port.set_model_name(port_data.get(PortKeys.NAME))
                 port_dict[address] = port
         return port_dict
 

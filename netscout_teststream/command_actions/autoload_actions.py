@@ -7,6 +7,17 @@ from cloudshell.cli.command_template.command_template_executor import CommandTem
 import netscout_teststream.command_templates.autoload as command_template
 
 
+class PortKeys():
+    PROTOCOL_ID = 'protocol_id'
+    NAME = 'name'
+    ADDRESS = 'address'
+
+
+# class BladeKeys():
+#     BLADE_ID = 'blade_id'
+#     BLADE_TYPE = 'blade_type'
+
+
 class AutoloadActions(object):
     """
     Autoload actions
@@ -60,42 +71,45 @@ class AutoloadActions(object):
         return chassis_table
 
     def _parse_blade_data(self, blades_data):
-        blades_id_type = re.findall(r'pim:\s+(\d+)\s+([\w-]+)', blades_data, flags=re.IGNORECASE | re.DOTALL)
+        blades_id_type = re.findall(r'pim:\s+(\d+)\s+([\w-]+)', blades_data, flags=re.IGNORECASE)
+        # blade_dict = {}
+        # blade_pattern = r'pim:\s+\d+\s+[\w-]+s*(.*)' * len(blades_id_type)
+        # blade_table_match = re.search(blade_pattern, blades_data,
+        #                               flags=re.IGNORECASE | re.DOTALL)
+        # for index in xrange(len(blades_id_type)):
+        #     blade_id = int(blades_id_type[index][0])
+        #     blade_type = blades_id_type[index][1]
+        #     data = blade_table_match.group(index + 1)
+        #     blade_info = re.search(
+        #         r"(?P<vendor>.*),(?P<model>.*),(?P<uboot_rev>.*),(?P<serial_number>.*)", data.strip(), re.DOTALL)
+        #
+        #     if not blade_info:
+        #         blade_info = re.search(
+        #             r"(?P<model>.*?)\s{2,}(?P<uboot_rev>.*?)\s{2,}(?P<serial_number>.*?)(\s{2,}|$)",
+        #             data.strip(),
+        #             re.DOTALL)
+        #     blade_dict[blade_id] = blade_info.groupdict()
+        #     blade_dict[blade_id]['blade_type'] = blade_type
+        # return blade_dict
         blade_dict = {}
-        blade_table_match = re.search(r'pim:\s+\d+\s+[\w-]+s*(.*)' * len(blades_id_type), blades_data,
-                                      flags=re.IGNORECASE | re.DOTALL)
-        for index in xrange(len(blades_id_type)):
-            blade_id = int(blades_id_type[index][0])
-            blade_type = blades_id_type[index][1]
-            data = blade_table_match.group(index + 1)
-            blade_info = re.search(
-                r"(?P<vendor>.*),(?P<model>.*),(?P<uboot_rev>.*),(?P<serial_number>.*)", data.strip(), re.DOTALL)
-
-            if not blade_info:
-                blade_info = re.search(
-                    r"(?P<model>.*?)\s{2,}(?P<uboot_rev>.*?)\s{2,}(?P<serial_number>.*?)(\s{2,}|$)",
-                    data.strip(),
-                    re.DOTALL)
-            blade_dict[blade_id] = blade_info.groupdict()
-            blade_dict[blade_id]['blade_type'] = blade_type
+        for blade_id, blade_type in blades_id_type:
+            blade_dict[int(blade_id)] = blade_type
         return blade_dict
 
     def port_table(self):
-        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_PORTS).execute_command(
+        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_PORTS_RAW).execute_command(
             switch_name=self._switch_name)
-        ports = {}
-        for port in re.search(r".*-\s(.*)", output, re.DOTALL).group(1).strip().splitlines():
-            info = re.search(r"(?P<phys_addr>.*?)[ ]{2,}"
-                             r"(?P<status>.*?)[ ]{2,}"
-                             r"(?P<name>.*?)[ ]{2,}"
-                             r".*?[ ]{2,}"  # Lock*/Rx Pwr(dBm)
-                             r".*?[ ]{2,}"  # Tx Pwr(dBm)
-                             r".*?[ ]{2,}"  # Rx Pwr(dBm)
-                             r"(?P<speed>.*?)[ ]{2,}"
-                             r"(?P<protocol>.*)", port)
+        port_table = {}
+        for line in output.strip().splitlines():
+            address, protocol_id, normal, connected, connected_dir, subport_tx, subport_rx, alarm, name = line.strip(
+            ).split(',')
+            port_table[address] = {
+                PortKeys.ADDRESS: address,
+                PortKeys.PROTOCOL_ID: protocol_id,
+                PortKeys.NAME: name.strip("'")
+            }
 
-            ports[info.group("phys_addr")] = info.groupdict()
-        return ports
+        return port_table
 
     def mapping_table(self):
         """Get mappings for all multi-cast/simplex/duplex port connections
@@ -110,11 +124,11 @@ class AutoloadActions(object):
         if "connection not found" in output.lower():
             return mapping_info
 
-        connections_list = re.search(r".*-\n(.*)\n\n", output, re.DOTALL)
-        if connections_list is None:
+        connections_data = re.search(r".*-\s+(.*)\s+", output, re.DOTALL)
+        if not connections_data:
             return mapping_info
-        else:
-            connections_list = connections_list.group(1).split('\n')
+
+        connections_list = connections_data.group(1).strip().splitlines()
         for conn_info in connections_list:
             conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                                   r"(?P<src_name>.*?)[ ]{2,}"
@@ -137,5 +151,5 @@ class AutoloadActions(object):
                 mapping_info[src] = dst
             else:
                 self._logger.warning("Can't set mapping for unhandled connection type. "
-                                       "Connection info: {}".format(conn_data))
+                                     "Connection info: {}".format(conn_data))
         return mapping_info

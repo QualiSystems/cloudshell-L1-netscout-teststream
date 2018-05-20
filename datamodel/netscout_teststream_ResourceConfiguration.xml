@@ -206,7 +206,15 @@
                     </ParentModels>
                     <Drivers/>
                 </ResourceModel>
-                <ResourceModel Name="HS-Bank" Description="" SupportsConcurrentCommands="false">
+                <ResourceModel Name="T100-Blade" Description="" SupportsConcurrentCommands="false">
+                    <AttachedAttributes/>
+                    <AttributeValues/>
+                    <ParentModels>
+                        <ParentModelName>Netscout Teststream Chassis</ParentModelName>
+                    </ParentModels>
+                    <Drivers/>
+                </ResourceModel>
+                <ResourceModel Name="Hs-Bank" Description="" SupportsConcurrentCommands="false">
                     <AttachedAttributes/>
                     <AttributeValues/>
                     <ParentModels>

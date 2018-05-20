@@ -1,0 +1,32 @@
+Switch: 3912X_24.30 [ 1 ]
+
+GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Conn Type  GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Speed    Protocol
+--------  -----------------------  -----------  ---------  --------  -----------------------  -----------  -------  --------
+01.07.01  24.30 01.07.01           Not Present  Duplex     01.06.01  24.30 01.06.01           Not Present  10000    Ethernet
+01.07.03  24.30 01.07.03           Not Present  Duplex     01.06.03  24.30 01.06.03           Not Present  10000    Ethernet
+01.07.04  24.30 01.07.04           Not Present  Duplex     01.06.04  24.30 01.06.04           Not Present  10000    Ethernet
+01.07.05  24.30 01.07.05           Not Present  Duplex     01.06.05  24.30 01.06.05           Not Present  10000    Ethernet
+01.07.06  24.30 01.07.06           Not Present  Duplex     01.06.06  24.30 01.06.06           Not Present  10000    Ethernet
+01.07.07  24.30 01.07.07           Not Present  Duplex     01.06.07  24.30 01.06.07           Not Present  10000    Ethernet
+01.07.08  24.30 01.07.08           Not Present  Duplex     01.06.08  24.30 01.06.08           Not Present  10000    Ethernet
+01.07.09  24.30 01.07.09           Not Present  Duplex     01.06.09  24.30 01.06.09           Not Present  10000    Ethernet
+01.07.10  24.30 01.07.10           Not Present  Duplex     01.06.10  24.30 01.06.10           Not Present  10000    Ethernet
+01.07.11  24.30 01.07.11           Not Present  Duplex     01.06.11  24.30 01.06.11           Not Present  10000    Ethernet
+01.07.12  24.30 01.07.12           Not Present  Duplex     01.06.12  24.30 01.06.12           Not Present  10000    Ethernet
+01.07.13  24.30 01.07.13           Not Present  Duplex     01.06.13  24.30 01.06.13           Not Present  10000    Ethernet
+01.07.14  24.30 01.07.14           Not Present  Duplex     01.06.14  24.30 01.06.14           Not Present  10000    Ethernet
+01.07.15  24.30 01.07.15           Not Present  Duplex     01.06.15  24.30 01.06.15           Not Present  10000    Ethernet
+01.07.16  24.30 01.07.16           Not Present  Duplex     01.06.16  24.30 01.06.16           Not Present  10000    Ethernet
+01.07.17  24.30 01.07.17           Not Present  Duplex     01.06.17  24.30 01.06.17           Not Present  10000    Ethernet
+01.07.18  24.30 01.07.18           Not Present  Duplex     01.06.18  24.30 01.06.18           Not Present  10000    Ethernet
+01.07.19  24.30 01.07.19           Not Present  Duplex     01.06.19  24.30 01.06.19           Not Present  10000    Ethernet
+01.07.20  24.30 01.07.20           Not Present  Duplex     01.06.20  24.30 01.06.20           Not Present  10000    Ethernet
+21.02.93  25.28 01.02.93           Not Present  Duplex     01.07.89  24.30 01.07.89           Not Present  10000    Ethernet
+01.01.17  24.30 01.01.17.01        Not Present  Unknown    01.01.21  24.30 01.01.21.02        Not Present  40000    Ethernet
+01.01.25  24.30 01.01.25           Not Present  Duplex     01.01.03  24.30 01.01.03           Not Present  40G/10G  Ethernet
+01.11.01  24.30 01.11.01           -1.718559    Duplex     01.12.01  24.30 01.12.01           -30.457575   10000    Ethernet
+01.11.05  24.30 01.11.05           -inf         Duplex     01.12.05  24.30 01.12.05           Not Present  1000     Ethernet
+01.11.08  24.30 01.11.08           Not Present  Duplex     01.12.08  24.30 01.12.08           Not Present  10000    Ethernet
+01.12.17  24.30 01.12.17           Not Present  Duplex     01.12.25  24.30 01.12.25           Not Present  40000    Ethernet
+
+

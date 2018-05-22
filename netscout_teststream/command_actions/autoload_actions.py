@@ -7,15 +7,11 @@ from cloudshell.cli.command_template.command_template_executor import CommandTem
 import netscout_teststream.command_templates.autoload as command_template
 
 
-class PortKeys():
-    PROTOCOL_ID = 'protocol_id'
-    NAME = 'name'
-    ADDRESS = 'address'
-
-
-# class BladeKeys():
-#     BLADE_ID = 'blade_id'
-#     BLADE_TYPE = 'blade_type'
+class PortInfoDTO:
+    def __init__(self, name, address, protocol_id):
+        self.name = name
+        self.address = address
+        self.protocol_id = protocol_id
 
 
 class AutoloadActions(object):
@@ -72,25 +68,7 @@ class AutoloadActions(object):
 
     def _parse_blade_data(self, blades_data):
         blades_id_type = re.findall(r'pim:\s+(\d+)\s+([\w-]+)', blades_data, flags=re.IGNORECASE)
-        # blade_dict = {}
-        # blade_pattern = r'pim:\s+\d+\s+[\w-]+s*(.*)' * len(blades_id_type)
-        # blade_table_match = re.search(blade_pattern, blades_data,
-        #                               flags=re.IGNORECASE | re.DOTALL)
-        # for index in xrange(len(blades_id_type)):
-        #     blade_id = int(blades_id_type[index][0])
-        #     blade_type = blades_id_type[index][1]
-        #     data = blade_table_match.group(index + 1)
-        #     blade_info = re.search(
-        #         r"(?P<vendor>.*),(?P<model>.*),(?P<uboot_rev>.*),(?P<serial_number>.*)", data.strip(), re.DOTALL)
-        #
-        #     if not blade_info:
-        #         blade_info = re.search(
-        #             r"(?P<model>.*?)\s{2,}(?P<uboot_rev>.*?)\s{2,}(?P<serial_number>.*?)(\s{2,}|$)",
-        #             data.strip(),
-        #             re.DOTALL)
-        #     blade_dict[blade_id] = blade_info.groupdict()
-        #     blade_dict[blade_id]['blade_type'] = blade_type
-        # return blade_dict
+
         blade_dict = {}
         for blade_id, blade_type in blades_id_type:
             blade_dict[int(blade_id)] = blade_type
@@ -103,12 +81,7 @@ class AutoloadActions(object):
         for line in output.strip().splitlines():
             address, protocol_id, normal, connected, connected_dir, subport_tx, subport_rx, alarm, name = line.strip(
             ).split(',')
-            port_table[address] = {
-                PortKeys.ADDRESS: address,
-                PortKeys.PROTOCOL_ID: protocol_id,
-                PortKeys.NAME: name.strip("'")
-            }
-
+            port_table[address] = PortInfoDTO(name.strip("'"), address, protocol_id)
         return port_table
 
     def mapping_table(self):
@@ -151,5 +124,5 @@ class AutoloadActions(object):
                 mapping_info[src] = dst
             else:
                 self._logger.warning("Can't set mapping for unhandled connection type. "
-                                     "Connection info: {}".format(conn_data))
+                                     "Connection info: {}".format(conn_info))
         return mapping_info

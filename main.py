@@ -36,9 +36,10 @@ class Main(object):
 
         command_logger.info('Starting driver {0} on port {1}, PID: {2}'.format(driver_name, self._port, os.getpid()))
 
+        driver_port_mode = runtime_config.read_key('DRIVER.PORT_MODE', None)
         # Importing and creating driver commands instance
         driver_commands = importlib.import_module('{}.driver_commands'.format(driver_name), package=None)
-        driver_instance = driver_commands.DriverCommands(command_logger)
+        driver_instance = driver_commands.DriverCommands(command_logger, driver_port_mode)
 
         # Creating command executor instance
         command_executor = CommandExecutor(driver_instance, command_logger)

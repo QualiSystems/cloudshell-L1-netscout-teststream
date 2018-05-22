@@ -1,32 +1,36 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
+from collections import defaultdict
 
 from cloudshell.layer_one.core.driver_commands_interface import DriverCommandsInterface
 from cloudshell.layer_one.core.response.resource_info.entities.chassis import Chassis
-from cloudshell.layer_one.core.response.resource_info.entities.port import Port
 from cloudshell.layer_one.core.response.response_info import GetStateIdResponseInfo
 from cloudshell.layer_one.core.response.response_info import ResourceDescriptionResponseInfo
 from netscout_teststream.cli.simulator.cli_simulator import CLISimulator
-from netscout_teststream.command_actions.autoload_actions import AutoloadActions, PortKeys
+from netscout_teststream.command_actions.autoload_actions import AutoloadActions
 from netscout_teststream.command_actions.mapping_actions import MappingActions
 from netscout_teststream.command_actions.system_actions import SystemActions
 from netscout_teststream.model.netscout_blade import NetscoutBlade
+from netscout_teststream.model.netscout_port import NetscoutPort
 
 
 class DriverCommands(DriverCommandsInterface):
     """
     Driver commands implementation
     """
+    LOGICAL_PORT_MODE = 'LOGICAL'
+    TX_SUBPORT_INDEX = 'TX'
+    RX_SUBPORT_INDEX = 'RX'
+    CHASSIS_ID = 1
 
-    NEW_MAJOR_VERSION = 3
-
-    def __init__(self, logger):
+    def __init__(self, logger, driver_port_mode=LOGICAL_PORT_MODE):
         """
         :param logger:
         :type logger: logging.Logger
         """
         self._logger = logger
+        self._driver_port_mode = driver_port_mode
         # self._cli_handler = NetscoutCliHandler(logger)
         self._cli_handler = CLISimulator(
             '/Users/yar/Projects/Quali/Github/LayerOne/cloudshell-L1-netscout-teststream/netscout_teststream/cli/simulator/data',
@@ -34,18 +38,15 @@ class DriverCommands(DriverCommandsInterface):
         self._switch_name = None
         self.__software_version = None
 
-    @property
-    def _software_version(self):
+    def _software_version(self, session):
         if not self.__software_version:
-            with self._cli_handler.default_mode_service() as session:
-                system_actions = SystemActions(self._switch_name, session, self._logger)
-                self.__software_version = system_actions.software_version()
+            system_actions = SystemActions(self._switch_name, session, self._logger)
+            self.__software_version = system_actions.software_version()
         return self.__software_version
 
     @property
-    def _new_command_format(self):
-        major_version = int(re.search(r"(\d+)", self._software_version).group(1))
-        return major_version >= self.NEW_MAJOR_VERSION
+    def _is_logical_port_mode(self):
+        return self._driver_port_mode == self.LOGICAL_PORT_MODE
 
     def login(self, address, username, password):
         """
@@ -130,7 +131,7 @@ class DriverCommands(DriverCommandsInterface):
         """
         :type address: str
         """
-        return address
+        return '.'.join(map(lambda x: x.zfill(2), [str(self.CHASSIS_ID)] + address.split('/')[1:]))
 
     def map_bidi(self, src_port, dst_port):
         """
@@ -147,10 +148,13 @@ class DriverCommands(DriverCommandsInterface):
                 session.send_command('map bidir {0} {1}'.format(convert_port(src_port), convert_port(dst_port)))
 
         """
+        if not self._driver_port_mode != self.LOGICAL_PORT_MODE:
+            raise Exception("Bidirectional port mapping could be done only in LOGICAL port_mode "
+                            "current mode: {}".format(self._driver_port_mode))
         with self._cli_handler.default_mode_service() as session:
             mapping_action = MappingActions(self._switch_name, session, self._logger)
-            mapping_action.connect_duplex(self._convert_port_address(src_port), self._convert_port_address(dst_port),
-                                          self._new_command_format)
+            mapping_action.connect_duplex(self._convert_port_address(src_port),
+                                          self._convert_port_address(dst_port), self._software_version(session))
 
     def map_uni(self, src_port, dst_ports):
         """
@@ -169,9 +173,20 @@ class DriverCommands(DriverCommandsInterface):
         """
         with self._cli_handler.default_mode_service() as session:
             mapping_action = MappingActions(self._switch_name, session, self._logger)
-            for port in dst_ports:
-                mapping_action.connect_simplex(self._convert_port_address(src_port), self._convert_port_address(port),
-                                               self._new_command_format)
+            src_address = self._convert_port_address(src_port)
+            exception_messages = []
+            for dst_port in dst_ports:
+                try:
+                    mapping_action.connect_simplex(src_address, self._convert_port_address(dst_port),
+                                                   self._software_version(session))
+                except Exception as e:
+                    if len(e.args) > 1:
+                        exception_messages.append(e.args[1])
+                    elif len(e.args) == 1:
+                        exception_messages.append(e.args[0])
+
+            if exception_messages:
+                raise Exception(self.__class__.__name__, ', '.join(exception_messages))
 
     def get_resource_description(self, address):
         """
@@ -213,7 +228,7 @@ class DriverCommands(DriverCommandsInterface):
             chassis_dict = {}
             autoload_actions = AutoloadActions(self._switch_name, session, self._logger)
             switch_model_name = autoload_actions.switch_model_name()
-            software_version = self._software_version
+            software_version = self._software_version(session)
             switch_address = autoload_actions.switch_ip_addr()
             ports_table = autoload_actions.port_table()
             blades_dict = {}
@@ -232,27 +247,29 @@ class DriverCommands(DriverCommandsInterface):
         self._logger.debug('Build Blades')
         blades_dict = {}
         for blade_id, blade_type in chassis_data.iteritems():
-            # blade_type = blade_data.get('blade_type')
-            # model_name = blade_data.get('model')
-            # serial_number = blade_data.get('serial_number')
             blade_instance = NetscoutBlade(blade_id, blade_type)
-            # blade_instance.set_model_name(model_name)
-            # blade_instance.set_serial_number(serial_number)
             blade_instance.set_parent_resource(chassis)
             blades_dict[(chassis_id, blade_id)] = blade_instance
         return blades_dict
 
     def _build_ports(self, blades_dict, ports_table):
         self._logger.debug('Build Ports')
-        port_dict = {}
-        for address, port_data in ports_table.iteritems():
+        port_dict = defaultdict(list)
+        for address, port_info in ports_table.iteritems():
+            """:type port_info: netscout_teststream.command_actions.autoload_actions.PortInfoDTO"""
             chassis_id, blade_id, port_id = address.split('.')
             blade = blades_dict.get((int(chassis_id), int(blade_id)))
             if blade:
-                port = Port(port_id)
-                port.set_parent_resource(blade)
-                port.set_model_name(port_data.get(PortKeys.NAME))
-                port_dict[address] = port
+                if self._is_logical_port_mode:
+                    port = NetscoutPort(port_id, port_info.name, port_info.protocol_id)
+                    port.set_parent_resource(blade)
+                    port_dict[address].append(port)
+                else:
+                    for suffix in (self.TX_SUBPORT_INDEX, self.RX_SUBPORT_INDEX):
+                        subport_id = "{}-{}".format(port_id, suffix)
+                        port = NetscoutPort(subport_id, port_info.name, port_info.protocol_id)
+                        port.set_parent_resource(blade)
+                        port_dict[address].append(port)
         return port_dict
 
     def _build_mappings(self, mapping_table, port_dict):
@@ -262,11 +279,17 @@ class DriverCommands(DriverCommandsInterface):
         """
         self._logger.debug("Build mappings")
         for src_addr, dst_addr in mapping_table.iteritems():
-            src_port = port_dict.get(src_addr)
+            src_port_list = port_dict.get(src_addr, [])
             """:type src_port: cloudshell.layer_one.core.response.resource_info.entities.port.Port"""
-            dst_port = port_dict.get(dst_addr)
-            if src_port and dst_port:
-                src_port.add_mapping(dst_port)
+            dst_port_list = port_dict.get(dst_addr, [])
+            """:type src_port: cloudshell.layer_one.core.response.resource_info.entities.port.Port"""
+            if len(src_port_list) == len(dst_port_list) == 1:
+                src_port_list[0].add_mapping(dst_port_list[0])
+            elif len(src_port_list) == len(dst_port_list) == 2:
+                src_port_list[0].add_mapping(dst_port_list[1])
+            else:
+                self._logger.warning(
+                    'Ports for the connection {0}:{1} are not properly defined'.format(src_addr, dst_addr))
 
     def map_clear(self, ports):
         """
@@ -287,7 +310,19 @@ class DriverCommands(DriverCommandsInterface):
                 if exceptions:
                     raise Exception('self.__class__.__name__', ','.join(exceptions))
         """
-        pass
+        exception_messages = []
+        for port in ports:
+            try:
+                port_addr = self._convert_port_address(port)
+                self._disconnect_ports(port_addr)
+            except Exception as e:
+                if len(e.args) > 1:
+                    exception_messages.append(e.args[1])
+                elif len(e.args) == 1:
+                    exception_messages.append(e.args[0])
+
+        if exception_messages:
+            raise Exception(self.__class__.__name__, ', '.join(exception_messages))
 
     def map_clear_to(self, src_port, dst_ports):
         """
@@ -306,39 +341,42 @@ class DriverCommands(DriverCommandsInterface):
                     _dst_port = convert_port(port)
                     session.send_command('map clear-to {0} {1}'.format(_src_port, _dst_port))
         """
-        pass
+        exception_messages = []
+        src_port_addr = self._convert_port_address(src_port)
+        for dst_port in dst_ports:
+            try:
+                dst_port_addr = self._convert_port_address(dst_port)
+                self._disconnect_ports(src_port_addr, dst_port_addr)
+            except Exception as e:
+                if len(e.args) > 1:
+                    exception_messages.append(e.args[1])
+                elif len(e.args) == 1:
+                    exception_messages.append(e.args[0])
 
-    def _con_simplex(self, src_port, dst_port):
-        """Perform simplex connection between source and destination ports
+        if exception_messages:
+            raise Exception(self.__class__.__name__, ', '.join(exception_messages))
 
-        :param src_port: (str) source port in format "<chassis>.<blade>.<port>"
-        :param dst_port: (str) destination port in format "<chassis>.<blade>.<port>"
-        :param command_logger: logging.Logger instance
-        :return: (str) output for the connect command from the device
-        """
-
-    def _con_duplex(self, src_port, dst_port):
-        """Perform duplex connection between source and destination ports
-
-        :param src_port: (str) source port in format "<chassis>.<blade>.<port>"
-        :param dst_port: (str) destination port in format "<chassis>.<blade>.<port>"
-        :param command_logger: logging.Logger instance
-        :return: (str) output for the connect command from the device
-        """
-
-        if not self.is_logical_port_mode:
-            raise Exception("Bidirectional port mapping could be done only in logical port_mode "
-                            "current mode: {}".format(self._port_mode))
-
-        if self._is_new_commands_format is None:
-            self._is_new_commands()
-
-        if self._is_new_commands_format:
-            command = "CONNECT -d -F PRTNUM {} PRTNUM {}".format(src_port, dst_port)
-        else:
-            command = "connect duplex prtnum {} to {} force".format(src_port, dst_port)
-
-        return self._session.send_command(command, re_string=self._prompt, error_map=error_map)
+    def _disconnect_ports(self, src_port, dst_port=None):
+        with self._cli_handler.default_mode_service() as session:
+            mapping_action = MappingActions(self._switch_name, session, self._logger)
+            connection_info = mapping_action.connection_info(src_port)
+            if not connection_info:
+                return
+            if dst_port and connection_info.dst_address != dst_port:
+                raise Exception(self.__class__.__name__,
+                                'SRC Port {0} connected to a different DST Port {1}'.format(src_port,
+                                                                                            connection_info.dst_address))
+            
+            if connection_info.connection_type.lower() == 'simplex':
+                mapping_action.disconnect_simplex(src_port, connection_info.dst_address,
+                                                  self._software_version(session))
+            elif connection_info.connection_type.lower() == 'duplex':
+                mapping_action.disconnect_duplex(src_port, connection_info.dst_address, self._software_version(session))
+            elif connection_info.connection_type.lower() == 'mcast':
+                mapping_action.disconnect_mcast(src_port, connection_info.dst_address, self._software_version(session))
+            else:
+                raise Exception(self.__class__.__name__, 'Connection type {} is no supported by the driver'.format(
+                    connection_info.connection_type))
 
     def get_attribute_value(self, cs_address, attribute_name):
         """

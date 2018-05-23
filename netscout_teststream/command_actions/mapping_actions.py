@@ -96,7 +96,7 @@ class MappingActions(object):
         template = command_template.SHOW_CONNECTION
         output = CommandTemplateExecutor(self._cli_service, template).execute_command(port=port_address)
         # matched = re.search(r".*-\n(.*)\n\n", output, re.DOTALL)
-        matched = re.search(r".*-\s+(.*)\s+", output, re.DOTALL)
+        matched = re.search(r".*--\s+(.*)\s+", output, re.DOTALL)
 
         if matched is None:
             self._logger.warning("Trying to clear connection which doesn't exist for port {}".format(port_address))

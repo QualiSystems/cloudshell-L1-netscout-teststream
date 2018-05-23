@@ -22,6 +22,7 @@ class DriverCommands(DriverCommandsInterface):
     LOGICAL_PORT_MODE = 'LOGICAL'
     TX_SUBPORT_INDEX = 'TX'
     RX_SUBPORT_INDEX = 'RX'
+    SUFFIX_SEPARATOR = '-'
     CHASSIS_ID = 1
 
     def __init__(self, logger, driver_port_mode=LOGICAL_PORT_MODE):
@@ -127,11 +128,13 @@ class DriverCommands(DriverCommandsInterface):
         """
         pass
 
-    def _convert_port_address(self, address):
+    def _convert_port_address(self, port_address):
         """
-        :type address: str
+        :type port_address: str
         """
-        return '.'.join(map(lambda x: x.zfill(2), [str(self.CHASSIS_ID)] + address.split('/')[1:]))
+        ip_addr, blade_id, port_id = port_address.split('/')
+        port_id = port_id.split(self.SUFFIX_SEPARATOR)[0]
+        return '.'.join(map(lambda x: x.zfill(2), [str(self.CHASSIS_ID), blade_id, port_id]))
 
     def map_bidi(self, src_port, dst_port):
         """
@@ -148,7 +151,7 @@ class DriverCommands(DriverCommandsInterface):
                 session.send_command('map bidir {0} {1}'.format(convert_port(src_port), convert_port(dst_port)))
 
         """
-        if not self._driver_port_mode != self.LOGICAL_PORT_MODE:
+        if not self._is_logical_port_mode:
             raise Exception("Bidirectional port mapping could be done only in LOGICAL port_mode "
                             "current mode: {}".format(self._driver_port_mode))
         with self._cli_handler.default_mode_service() as session:
@@ -171,6 +174,10 @@ class DriverCommands(DriverCommandsInterface):
                 for dst_port in dst_ports:
                     session.send_command('map {0} also-to {1}'.format(convert_port(src_port), convert_port(dst_port)))
         """
+        if not self._is_logical_port_mode:
+            self._validate_tx_port(src_port)
+            map(lambda x: self._validate_rx_subport(x), dst_ports)
+
         with self._cli_handler.default_mode_service() as session:
             mapping_action = MappingActions(self._switch_name, session, self._logger)
             src_address = self._convert_port_address(src_port)
@@ -289,7 +296,7 @@ class DriverCommands(DriverCommandsInterface):
                 src_port_list[0].add_mapping(dst_port_list[1])
             else:
                 self._logger.warning(
-                    'Ports for the connection {0}:{1} are not properly defined'.format(src_addr, dst_addr))
+                    'Ports, for the connection {0}=>{1}, are not properly defined'.format(src_addr, dst_addr))
 
     def map_clear(self, ports):
         """
@@ -341,6 +348,10 @@ class DriverCommands(DriverCommandsInterface):
                     _dst_port = convert_port(port)
                     session.send_command('map clear-to {0} {1}'.format(_src_port, _dst_port))
         """
+        if not self._is_logical_port_mode:
+            self._validate_tx_port(src_port)
+            map(lambda x: self._validate_rx_subport(x), dst_ports)
+
         exception_messages = []
         src_port_addr = self._convert_port_address(src_port)
         for dst_port in dst_ports:
@@ -366,7 +377,7 @@ class DriverCommands(DriverCommandsInterface):
                 raise Exception(self.__class__.__name__,
                                 'SRC Port {0} connected to a different DST Port {1}'.format(src_port,
                                                                                             connection_info.dst_address))
-            
+
             if connection_info.connection_type.lower() == 'simplex':
                 mapping_action.disconnect_simplex(src_port, connection_info.dst_address,
                                                   self._software_version(session))
@@ -377,6 +388,36 @@ class DriverCommands(DriverCommandsInterface):
             else:
                 raise Exception(self.__class__.__name__, 'Connection type {} is no supported by the driver'.format(
                     connection_info.connection_type))
+
+    def _validate_tx_port(self, port_address):
+        """Validate if given sub-port is a correct transceiver sub-port, return logical port part
+
+        Example:
+            sub-port "1.1.1-Tx" => port "1.1.1"
+            sub-port "1.1.1-Rx" => raise Exception
+
+        :param port_address: (str) sub-port in format "<chassis>.<blade>.<port>-Tx"
+        :return: (str) logical port part for the given sub-port
+        """
+        ip_addr, blade_id, port_id = port_address.split('/')
+        port, sub_idx = port_id.split(self.SUFFIX_SEPARATOR)
+        if sub_idx.upper() != self.TX_SUBPORT_INDEX.upper():
+            raise Exception("Receiver sub-port can't be used as a source")
+
+    def _validate_rx_subport(self, port_address):
+        """Validate if given sub-port is a correct receiver sub-port, return logical port part
+
+        Example:
+            sub-port "1.1.1-Rx" => port "1.1.1"
+            sub-port "1.1.1-Tx" => raise Exception
+
+        :param port_address: (str) sub-port in format "<chassis>.<blade>.<port>-Rx"
+        :return: (str) logical port part for the given sub-port
+        """
+        ip_addr, blade_id, port_id = port_address.split('/')
+        port, sub_idx = port_id.split(self.SUFFIX_SEPARATOR)
+        if sub_idx.upper() != self.RX_SUBPORT_INDEX.upper():
+            raise Exception("Transmitter sub-port can't be used as a destination")
 
     def get_attribute_value(self, cs_address, attribute_name):
         """

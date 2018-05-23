@@ -13,11 +13,11 @@ class NetscoutBlade(Blade):
         r'hs[-_\s]bank': 'Hs-Bank'
     }
 
-    def _find_blade_model(self, model_name):
+    def _associate_blade_model(self, model_name):
         for patt in self.REGISTERED_MODELS:
             if re.search(patt, model_name, flags=re.IGNORECASE):
                 return self.REGISTERED_MODELS[patt]
         raise Exception(self.__class__.__name__, 'Blade model {} is not registered'.format(model_name))
 
     def __init__(self, resource_id, model_name):
-        super(NetscoutBlade, self).__init__(resource_id, model_name=self._find_blade_model(model_name))
+        super(NetscoutBlade, self).__init__(resource_id, model_name=self._associate_blade_model(model_name))

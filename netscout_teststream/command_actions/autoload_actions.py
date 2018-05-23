@@ -97,7 +97,7 @@ class AutoloadActions(object):
         if "connection not found" in output.lower():
             return mapping_info
 
-        connections_data = re.search(r".*-\s+(.*)\s+", output, re.DOTALL)
+        connections_data = re.search(r".*--\s+(.*)\s+", output, re.DOTALL)
         if not connections_data:
             return mapping_info
 

@@ -2,3 +2,7 @@ Available Switches:
 HS-3200
 OS-192
 3912X_24.30
+3912_Kaiser
+3200X_26.27
+3903X_25.28
+OS192_103

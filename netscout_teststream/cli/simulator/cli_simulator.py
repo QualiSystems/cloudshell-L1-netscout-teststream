@@ -30,7 +30,9 @@ class TestCliService(CliService):
     def send_command(self, command, expected_string=None, action_map=None, error_map=None, logger=None, *args,
                      **kwargs):
         self._logger.debug(command)
-        file_name = re.sub('\s', '_', command) + '.txt'
+        file_name = re.sub('\*', 'asterisk', command)
+        file_name = re.sub('\s', '_', file_name) + '.txt'
+
         try:
             with open(os.path.join(self._data_path, file_name), 'r') as f:
                 output = f.read()

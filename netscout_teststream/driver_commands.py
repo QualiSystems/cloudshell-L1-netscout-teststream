@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import os
 import re
 from collections import defaultdict
 
@@ -34,7 +35,7 @@ class DriverCommands(DriverCommandsInterface):
         self._driver_port_mode = driver_port_mode
         # self._cli_handler = NetscoutCliHandler(logger)
         self._cli_handler = CLISimulator(
-            '/Users/yar/Projects/Quali/Github/LayerOne/cloudshell-L1-netscout-teststream/netscout_teststream/cli/simulator/data',
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cli', 'simulator', 'data'),
             logger)
         self._switch_name = None
         self.__software_version = None

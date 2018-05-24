@@ -323,6 +323,14 @@
                     </ParentModels>
                     <Drivers/>
                 </ResourceModel>
+                <ResourceModel Name="P-Blade" Description="" SupportsConcurrentCommands="false">
+                    <AttachedAttributes/>
+                    <AttributeValues/>
+                    <ParentModels>
+                        <ParentModelName>Netscout Teststream Chassis</ParentModelName>
+                    </ParentModels>
+                    <Drivers/>
+                </ResourceModel>
             </Models>
         </ResourceFamily>
         <ResourceFamily Name="L1 Switch Port" IsMappableContainer="false" IsMappable="true"
@@ -407,6 +415,7 @@
                         <ParentModelName>T100-Blade</ParentModelName>
                         <ParentModelName>T100L-Blade</ParentModelName>
                         <ParentModelName>Hs-Bank</ParentModelName>
+                        <ParentModelName>P-Blade</ParentModelName>
                     </ParentModels>
                     <Drivers/>
                 </ResourceModel>

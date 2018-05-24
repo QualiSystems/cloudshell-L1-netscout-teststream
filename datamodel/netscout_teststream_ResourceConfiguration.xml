@@ -400,7 +400,7 @@
                         <AttributeValue Name="Protocol Type" Value="0"/>
                     </AttributeValues>
                     <ParentModels>
-                        <ParentModelName>O-Blad</ParentModelName>
+                        <ParentModelName>O-Blade</ParentModelName>
                         <ParentModelName>S-Blade</ParentModelName>
                         <ParentModelName>S-Blade-Pro</ParentModelName>
                         <ParentModelName>T-Blade</ParentModelName>

@@ -10,6 +10,7 @@ class NetscoutBlade(Blade):
         r's[-_\s]blade[-_\s]pro': 'S-Blade-Pro',
         r't[-_\s]blade': 'T-Blade',
         r't100[-_\s]blade': 'T100-Blade',
+        r't100l[-_\s]blade': 'T100L-Blade',
         r'hs[-_\s]bank': 'Hs-Bank'
     }
 

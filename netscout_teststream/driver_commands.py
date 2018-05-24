@@ -378,7 +378,7 @@ class DriverCommands(DriverCommandsInterface):
                                 'SRC Port {0} connected to a different DST Port {1}'.format(src_port,
                                                                                             connection_info.dst_address))
 
-            if connection_info.connection_type.lower() == 'simplex':
+            if connection_info.connection_type.lower() in ['simplex', 'unknown']:
                 mapping_action.disconnect_simplex(src_port, connection_info.dst_address,
                                                   self._software_version(session))
             elif connection_info.connection_type.lower() == 'duplex':

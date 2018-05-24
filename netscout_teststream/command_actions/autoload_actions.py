@@ -117,7 +117,7 @@ class AutoloadActions(object):
             src = conn_data.group('src_addr')
             dst = conn_data.group('dst_addr')
 
-            if conn_type in ('simplex', 'mcast'):
+            if conn_type in ('simplex', 'mcast', 'unknown'):
                 mapping_info[dst] = src
             elif conn_type == 'duplex':
                 mapping_info[dst] = src

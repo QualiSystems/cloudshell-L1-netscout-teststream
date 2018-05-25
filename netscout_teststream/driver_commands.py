@@ -5,9 +5,9 @@ import re
 from collections import defaultdict
 
 from cloudshell.layer_one.core.driver_commands_interface import DriverCommandsInterface
-from cloudshell.layer_one.core.response.resource_info.entities.chassis import Chassis
 from cloudshell.layer_one.core.response.response_info import GetStateIdResponseInfo
 from cloudshell.layer_one.core.response.response_info import ResourceDescriptionResponseInfo
+from netscout_teststream.cli.netscout_cli_handler import NetscoutCliHandler
 from netscout_teststream.cli.simulator.cli_simulator import CLISimulator
 from netscout_teststream.command_actions.autoload_actions import AutoloadActions
 from netscout_teststream.command_actions.mapping_actions import MappingActions
@@ -34,10 +34,10 @@ class DriverCommands(DriverCommandsInterface):
         """
         self._logger = logger
         self._driver_port_mode = driver_port_mode
-        # self._cli_handler = NetscoutCliHandler(logger)
-        self._cli_handler = CLISimulator(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cli', 'simulator', 'data'),
-            logger)
+        self._cli_handler = NetscoutCliHandler(logger)
+        # self._cli_handler = CLISimulator(
+        #     os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cli', 'simulator', 'data'),
+        #     logger)
         self._switch_name = None
         self.__software_version = None
 

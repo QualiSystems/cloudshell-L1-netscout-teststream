@@ -294,9 +294,9 @@ class DriverCommands(DriverCommandsInterface):
             dst_port_list = port_dict.get(dst_addr, [])
             """:type src_port: cloudshell.layer_one.core.response.resource_info.entities.port.Port"""
             if len(src_port_list) == len(dst_port_list) == 1:
-                src_port_list[0].add_mapping(dst_port_list[0])
+                dst_port_list[0].add_mapping(src_port_list[0])
             elif len(src_port_list) == len(dst_port_list) == 2:
-                src_port_list[0].add_mapping(dst_port_list[1])
+                src_port_list[1].add_mapping(dst_port_list[0])
             else:
                 self._logger.warning(
                     'Ports, for the connection {0}=>{1}, are not properly defined'.format(src_addr, dst_addr))

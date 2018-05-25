@@ -28,6 +28,12 @@
                 <TagName Name="Available For Abstract Resources"/>
             </Tags>
         </AttributeInfo>
+        <AttributeInfo Name="IP Address" Type="String" DefaultValue="NA" IsReadOnly="true" IsCommand="true">
+            <Tags>
+                <TagName Name="Setting"/>
+                <TagName Name="Available For Abstract Resources"/>
+            </Tags>
+        </AttributeInfo>
         <AttributeInfo Name="Rx Power (dBm)" Type="String" DefaultValue="0" IsReadOnly="true" IsCommand="true">
             <Tags>
                 <TagName Name="Setting"/>
@@ -248,6 +254,9 @@
                             <AllowedValues/>
                         </AttachedAttribute>
                         <AttachedAttribute Name="OS Version" IsOverridable="true" IsLocal="true">
+                            <AllowedValues/>
+                        </AttachedAttribute>
+                        <AttachedAttribute Name="IP Address" IsOverridable="true" IsLocal="true">
                             <AllowedValues/>
                         </AttachedAttribute>
                     </AttachedAttributes>

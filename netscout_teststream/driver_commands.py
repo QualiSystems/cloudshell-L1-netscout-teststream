@@ -13,6 +13,7 @@ from netscout_teststream.command_actions.autoload_actions import AutoloadActions
 from netscout_teststream.command_actions.mapping_actions import MappingActions
 from netscout_teststream.command_actions.system_actions import SystemActions
 from netscout_teststream.model.netscout_blade import NetscoutBlade
+from netscout_teststream.model.netscout_chassis import NetscoutChassis
 from netscout_teststream.model.netscout_port import NetscoutPort
 
 
@@ -241,7 +242,8 @@ class DriverCommands(DriverCommandsInterface):
             ports_table = autoload_actions.port_table()
             blades_dict = {}
             for chassis_id, chassis_data in autoload_actions.chassis_table().iteritems():
-                chassis = Chassis(chassis_id, switch_address, 'Netscout Teststream Chassis', None)
+                chassis = NetscoutChassis(chassis_id, address)
+                chassis.set_ip_address(switch_address)
                 chassis.set_model_name(switch_model_name)
                 chassis.set_os_version(software_version)
                 chassis_dict[chassis_id] = chassis

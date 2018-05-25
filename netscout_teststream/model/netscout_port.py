@@ -46,6 +46,7 @@ class NetscoutPort(Port):
         self.set_protocol(protocol_id)
         self.set_protocol_type(protocol_type_id)
         self.set_model_name(port_model_name)
+        self.set_protocol_value(netscout_protocol_id)
 
     def set_protocol(self, value):
         if value is not None:

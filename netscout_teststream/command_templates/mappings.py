@@ -4,8 +4,7 @@ from cloudshell.cli.command_template.command_template import CommandTemplate
 from netscout_teststream.command_templates.ERRORS import GENERIC_ERRORS
 
 ACTION_MAP = OrderedDict()
-ERROR_MAP = OrderedDict([("[Nn]ot [Ff]ound", "Subport was not found"),
-                         ("[Nn]ot compatible", "Ports\Subports not compatible"),
+ERROR_MAP = OrderedDict([("[Nn]ot compatible", "Ports\Subports not compatible"),
                          ("[Ee]rror|ERROR", "Error during command execution. See logs for more details"),
                          ("[Ii]ncorrect", "Incorrect port number format")])
 ERROR_MAP.update(GENERIC_ERRORS)

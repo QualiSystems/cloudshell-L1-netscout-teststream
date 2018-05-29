@@ -104,6 +104,10 @@ class MappingActions(object):
             return None
 
         conn_info = matched.group(1)
+
+        if re.search('connection\snot\sfound', conn_info, re.IGNORECASE | re.DOTALL):
+            return
+        
         connection_list = []
         for data in conn_info.strip().splitlines():
             conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"

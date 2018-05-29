@@ -37,8 +37,8 @@ class AutoloadActions(object):
     @property
     def _switch_info_table(self):
         if not self.__switch_info_table:
-            output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_SWITCH_INFO).execute_command(
-                switch_name=self._switch_name)
+            output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_SWITCH_INFO,
+                                             remove_prompt=True).execute_command(switch_name=self._switch_name)
             info_match = re.search(
                 r'\s*\*+\s+PHYSICAL\sINFORMATION\s\*+\s*(?P<physical_info>.*)'
                 r'\s*\*+\s+SWITCH\sCOMPONENTS\s\*+\s*(?P<switch_components>.*)',
@@ -75,8 +75,8 @@ class AutoloadActions(object):
         return blade_dict
 
     def port_table(self):
-        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_PORTS_RAW).execute_command(
-            switch_name=self._switch_name)
+        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_PORTS_RAW,
+                                         remove_prompt=True).execute_command(switch_name=self._switch_name)
         port_table = {}
         for line in output.strip().splitlines():
             address, protocol_id, normal, connected, connected_dir, subport_tx, subport_rx, alarm, name = line.strip(
@@ -90,8 +90,8 @@ class AutoloadActions(object):
         :param command_logger: logging.Logger instance
         :return: (dictionary) destination sub-port => source sub-port
         """
-        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_CONNECTIONS).execute_command(
-            switch_name=self._switch_name)
+        output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_CONNECTIONS,
+                                         remove_prompt=True).execute_command(switch_name=self._switch_name)
         mapping_info = {}
 
         if "connection not found" in output.lower():

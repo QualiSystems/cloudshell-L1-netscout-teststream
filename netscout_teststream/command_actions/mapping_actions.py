@@ -94,7 +94,7 @@ class MappingActions(object):
     def connection_info(self, port_address):
         self.select_switch()
         template = command_template.SHOW_CONNECTION
-        output = CommandTemplateExecutor(self._cli_service, template).execute_command(port=port_address)
+        output = CommandTemplateExecutor(self._cli_service, template, remove_prompt=True).execute_command(port=port_address)
         # matched = re.search(r".*-\n(.*)\n\n", output, re.DOTALL)
         matched = re.search(r".*--\s+(.*)\s+", output, re.DOTALL)
 

@@ -104,6 +104,7 @@ class MappingActions(object):
             return None
 
         conn_info = matched.group(1)
+        connection_list = []
         for data in conn_info.strip().splitlines():
             conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
                                   r"(?P<src_name>.*?)[ ]{2,}"
@@ -121,5 +122,6 @@ class MappingActions(object):
             src_addr_info = conn_data.group("src_addr")
             dst_addr_info = conn_data.group("dst_addr")
             connection_type_info = conn_data.group("connection_type")
-            if src_addr_info == src_address:
-                return ConnectionInfoDTO(src_addr_info, dst_addr_info, connection_type_info)
+            # if src_addr_info == src_address:
+            connection_list.append(ConnectionInfoDTO(src_addr_info, dst_addr_info, connection_type_info))
+        return connection_list

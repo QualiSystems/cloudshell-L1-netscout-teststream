@@ -373,25 +373,26 @@ class DriverCommands(DriverCommandsInterface):
     def _disconnect_ports(self, src_port, dst_port=None):
         with self._cli_handler.default_mode_service() as session:
             mapping_action = MappingActions(self._switch_name, session, self._logger)
-            connection_info = mapping_action.connection_info(src_port)
-            if not connection_info:
+            connection_info_list = mapping_action.connection_info(src_port)
+            if not connection_info_list:
                 self._logger.debug('Port {} is not connected'.format(src_port))
                 return
-            if dst_port and connection_info.dst_address != dst_port:
-                raise Exception(self.__class__.__name__,
-                                'SRC Port {0} connected to a different DST Port {1}'.format(src_port,
-                                                                                            connection_info.dst_address))
+            for connection_info in connection_info_list:
+                if dst_port and connection_info.dst_address != dst_port:
+                    continue
 
-            if connection_info.connection_type.lower() in ['simplex', 'unknown']:
-                mapping_action.disconnect_simplex(src_port, connection_info.dst_address,
-                                                  self._software_version(session))
-            elif connection_info.connection_type.lower() == 'duplex':
-                mapping_action.disconnect_duplex(src_port, connection_info.dst_address, self._software_version(session))
-            elif connection_info.connection_type.lower() == 'mcast':
-                mapping_action.disconnect_mcast(src_port, connection_info.dst_address, self._software_version(session))
-            else:
-                raise Exception(self.__class__.__name__, 'Connection type {} is no supported by the driver'.format(
-                    connection_info.connection_type))
+                if connection_info.connection_type.lower() in ['simplex', 'unknown']:
+                    mapping_action.disconnect_simplex(connection_info.src_address, connection_info.dst_address,
+                                                      self._software_version(session))
+                elif connection_info.connection_type.lower() == 'duplex':
+                    mapping_action.disconnect_duplex(connection_info.src_address, connection_info.dst_address,
+                                                     self._software_version(session))
+                elif connection_info.connection_type.lower() == 'mcast':
+                    mapping_action.disconnect_mcast(connection_info.src_address, connection_info.dst_address,
+                                                    self._software_version(session))
+                else:
+                    raise Exception(self.__class__.__name__, 'Connection type {} is no supported by the driver'.format(
+                        connection_info.connection_type))
 
     def _validate_tx_port(self, port_address):
         """Validate if given sub-port is a correct transceiver sub-port, return logical port part

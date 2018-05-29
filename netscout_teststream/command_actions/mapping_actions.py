@@ -88,33 +88,38 @@ class MappingActions(object):
         self.select_switch()
 
         output = CommandTemplateExecutor(self._cli_service, command_template.DISCONNECT_MCAST).execute_command(
-                dst_port=dst_port)
+            dst_port=dst_port)
         return output
 
-    def connection_info(self, port_address):
+    def connection_info(self, src_address):
         self.select_switch()
         template = command_template.SHOW_CONNECTION
-        output = CommandTemplateExecutor(self._cli_service, template, remove_prompt=True).execute_command(port=port_address)
+        output = CommandTemplateExecutor(self._cli_service, template, remove_prompt=True).execute_command(
+            port=src_address)
         # matched = re.search(r".*-\n(.*)\n\n", output, re.DOTALL)
         matched = re.search(r".*--\s+(.*)\s+", output, re.DOTALL)
 
         if matched is None:
-            self._logger.warning("Trying to clear connection which doesn't exist for port {}".format(port_address))
+            self._logger.warning("Trying to clear connection which doesn't exist for port {}".format(src_address))
             return None
 
         conn_info = matched.group(1)
-        conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
-                              r"(?P<src_name>.*?)[ ]{2,}"
-                              r".*?[ ]{2,}"  # src Rx Pwr(dBm)
-                              r"(?P<connection_type>.*?)[ ]{2,}"
-                              r"(?P<dst_addr>.*?)[ ]{2,}"
-                              r"(?P<dst_name>.*?)[ ]{2,}"
-                              r".*?[ ]{2,}"  # dst Rx Pwr(dBm)
-                              r"(?P<speed>.*)"
-                              r"(?P<protocol>.*)",
-                              conn_info)
-        if not conn_data:
-            self._logger.warning('Cannot parse connection data for port {}'.format(port_address))
-            return None
-        return ConnectionInfoDTO(conn_data.group("src_addr"), conn_data.group("dst_addr"),
-                                 conn_data.group("connection_type"))
+        for data in conn_info.strip().splitlines():
+            conn_data = re.search(r"(?P<src_addr>.*?)[ ]{2,}"
+                                  r"(?P<src_name>.*?)[ ]{2,}"
+                                  r".*?[ ]{2,}"  # src Rx Pwr(dBm)
+                                  r"(?P<connection_type>.*?)[ ]{2,}"
+                                  r"(?P<dst_addr>.*?)[ ]{2,}"
+                                  r"(?P<dst_name>.*?)[ ]{2,}"
+                                  r".*?[ ]{2,}"  # dst Rx Pwr(dBm)
+                                  r"(?P<speed>.*)"
+                                  r"(?P<protocol>.*)",
+                                  data)
+            if not conn_data:
+                self._logger.warning('Cannot parse connection data for port {}'.format(src_address))
+                continue
+            src_addr_info = conn_data.group("src_addr")
+            dst_addr_info = conn_data.group("dst_addr")
+            connection_type_info = conn_data.group("connection_type")
+            if src_addr_info == src_address:
+                return ConnectionInfoDTO(src_addr_info, dst_addr_info, connection_type_info)

@@ -375,6 +375,7 @@ class DriverCommands(DriverCommandsInterface):
             mapping_action = MappingActions(self._switch_name, session, self._logger)
             connection_info = mapping_action.connection_info(src_port)
             if not connection_info:
+                self._logger.debug('Port {} is not connected'.format(src_port))
                 return
             if dst_port and connection_info.dst_address != dst_port:
                 raise Exception(self.__class__.__name__,

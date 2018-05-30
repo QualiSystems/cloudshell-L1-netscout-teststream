@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import re
+from collections import defaultdict
 
 from cloudshell.cli.command_template.command_template_executor import CommandTemplateExecutor
 import netscout_teststream.command_templates.autoload as command_template
@@ -92,7 +93,7 @@ class AutoloadActions(object):
         """
         output = CommandTemplateExecutor(self._cli_service, command_template.SHOW_CONNECTIONS,
                                          remove_prompt=True).execute_command(switch_name=self._switch_name)
-        mapping_info = {}
+        mapping_info = defaultdict(list)
 
         if "connection not found" in output.lower():
             return mapping_info
@@ -118,10 +119,10 @@ class AutoloadActions(object):
             dst = conn_data.group('dst_addr')
 
             if conn_type in ('simplex', 'mcast', 'unknown'):
-                mapping_info[dst] = src
+                mapping_info[src].append(dst)
             elif conn_type == 'duplex':
-                mapping_info[dst] = src
-                mapping_info[src] = dst
+                mapping_info[src].append(dst)
+                mapping_info[dst].append(src)
             else:
                 self._logger.warning("Can't set mapping for unhandled connection type. "
                                      "Connection info: {}".format(conn_info))

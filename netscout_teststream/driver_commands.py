@@ -49,7 +49,7 @@ class DriverCommands(DriverCommandsInterface):
 
     @property
     def _is_logical_port_mode(self):
-        return self._driver_port_mode == self.LOGICAL_PORT_MODE
+        return self._driver_port_mode.lower() == self.LOGICAL_PORT_MODE.lower()
 
     def login(self, address, username, password):
         """
@@ -288,18 +288,19 @@ class DriverCommands(DriverCommandsInterface):
         :type port_dict: dict
         """
         self._logger.debug("Build mappings")
-        for src_addr, dst_addr in mapping_table.iteritems():
-            src_port_list = port_dict.get(src_addr, [])
-            """:type src_port: cloudshell.layer_one.core.response.resource_info.entities.port.Port"""
-            dst_port_list = port_dict.get(dst_addr, [])
-            """:type src_port: cloudshell.layer_one.core.response.resource_info.entities.port.Port"""
-            if len(src_port_list) == len(dst_port_list) == 1:
-                dst_port_list[0].add_mapping(src_port_list[0])
-            elif len(src_port_list) == len(dst_port_list) == 2:
-                dst_port_list[1].add_mapping(src_port_list[0])
+        for src_addr, dst_addr_list in mapping_table.iteritems():
+            self._map_ports(src_addr, dst_addr_list, port_dict)
+
+    def _map_ports(self, src_addr, dst_addr_list, port_dict):
+        src_port = port_dict.get(src_addr, [])[0]
+        """:type src_port: netscout_teststream.model.netscout_port.NetscoutPort"""
+        for dst_addr in dst_addr_list:
+            if self._is_logical_port_mode:
+                dst_port = port_dict.get(dst_addr, [])[0]
             else:
-                self._logger.warning(
-                    'Ports, for the connection {0}=>{1}, are not properly defined'.format(src_addr, dst_addr))
+                dst_port = port_dict.get(dst_addr, [])[1]
+                """:type dst_port: netscout_teststream.model.netscout_port.NetscoutPort"""
+            dst_port.add_mapping(src_port)
 
     def map_clear(self, ports):
         """

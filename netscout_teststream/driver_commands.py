@@ -478,7 +478,7 @@ class DriverCommands(DriverCommandsInterface):
         Example:
             return self.map_uni(src_port, dst_ports)
         """
-        raise NotImplementedError
+        return self.map_uni(src_port, dst_ports)
 
     def set_speed_manual(self, src_port, dst_port, speed, duplex):
         """

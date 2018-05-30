@@ -1,7 +1,7 @@
 @ECHO OFF
 setlocal
-set SERVER_FOLDER=C:\Program Files (x86)\QualiSystems\CloudShell\Server
-set DRIVERS_FOLDER=%SERVER_FOLDER%\Drivers
+set DRIVERS_FOLDER=%cd%
+set SERVER_FOLDER=%DRIVERS_FOLDER%\..
 set DRIVER_NAME=%~n0
 set LOGS_PATH="%SERVER_FOLDER%\Logs"
 set DRIVER_ENV=%DRIVERS_FOLDER%\cloudshell-L1-%DRIVER_NAME%

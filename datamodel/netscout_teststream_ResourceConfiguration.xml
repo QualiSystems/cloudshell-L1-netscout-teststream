@@ -233,7 +233,7 @@
         <ResourceFamily Name="L1 Switch" IsMappableContainer="true" IsMappable="false"
                         IsConnectable="false" IsLicenseCheckRequired="false" IsAllConnectedContainer="false"
                         IsLockedByDefault="false" AcceptsMultipleConnections="false" Description=""
-                        SupportsMulticastMapping="false" SupportsLoopbackMapping="true" IsPowerSwitch="false"
+                        SupportsMulticastMapping="true" SupportsLoopbackMapping="true" IsPowerSwitch="false"
                         IsConsoleServer="false">
             <AttachedAttributes>
                 <AttachedAttribute Name="User" IsOverridable="true" IsLocal="true">
@@ -245,7 +245,7 @@
             </AttachedAttributes>
             <AttributeValues/>
             <Models>
-                <ResourceModel Name="Netscout Teststream Chassis" Description="" SupportsConcurrentCommands="false">
+                <ResourceModel Name="Netscout Teststream Chassis" Description="" SupportsConcurrentCommands="false" SupportsMulticastMapping="false">
                     <AttachedAttributes>
                         <AttachedAttribute Name="Model Name" IsOverridable="true" IsLocal="true">
                             <AllowedValues/>

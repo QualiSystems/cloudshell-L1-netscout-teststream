@@ -201,6 +201,45 @@
                 <TagName Name="Available For Abstract Resources"/>
             </Tags>
         </AttributeInfo>
+        <AttributeInfo xsi:type="LookupAttributeDetails" Name="Speed" Type="Lookup" DefaultValue="2" IsReadOnly="false"
+                       IsCommand="true">
+            <Tags>
+                <TagName Name="Setting"/>
+                <TagName Name="Available For Abstract Resources"/>
+                <TagName Name="Variable Capability"/>
+            </Tags>
+            <LookupValues>
+                <LookupValue NumericValue="1" StringValue="NA"/>
+                <LookupValue NumericValue="2" StringValue="10 Mbps"/>
+                <LookupValue NumericValue="3" StringValue="100 Mbps"/>
+                <LookupValue NumericValue="4" StringValue="1 Gbps"/>
+                <LookupValue NumericValue="5" StringValue="10 Gbps"/>
+                <LookupValue NumericValue="6" StringValue="1 Gbps CU"/>
+                <LookupValue NumericValue="11" StringValue="1 Gbps Fiber"/>
+                <LookupValue NumericValue="12" StringValue="2 Gbps Fiber"/>
+                <LookupValue NumericValue="13" StringValue="4 Gbps Fiber"/>
+                <LookupValue NumericValue="14" StringValue="8 Gbps Fiber"/>
+                <LookupValue NumericValue="15" StringValue="10 Gbps Fiber Serial"/>
+                <LookupValue NumericValue="21" StringValue="2.5 Gbps Sonnet"/>
+                <LookupValue NumericValue="22" StringValue="10 Gbps Sonnet"/>
+                <LookupValue NumericValue="31" StringValue="2.5 Gbps Infiniband"/>
+                <LookupValue NumericValue="32" StringValue="10 Gbps Infiniband"/>
+                <LookupValue NumericValue="41" StringValue="200 Mbps ESCON/SBCON"/>
+                <LookupValue NumericValue="42" StringValue="25 Gbps"/>
+                <LookupValue NumericValue="43" StringValue="40 Gbps"/>
+                <LookupValue NumericValue="44" StringValue="50 Gbps"/>
+                <LookupValue NumericValue="45" StringValue="100 Gbps"/>
+                <LookupValue NumericValue="46" StringValue="614.4 Mbps CPRI"/>
+                <LookupValue NumericValue="47" StringValue="1,228.8 Mbps CPRI"/>
+                <LookupValue NumericValue="48" StringValue="2,457.6 Mbps CPRI"/>
+                <LookupValue NumericValue="49" StringValue="3,072.0 Mbps CPRI"/>
+                <LookupValue NumericValue="50" StringValue="4,915.2 Mbps CPRI"/>
+                <LookupValue NumericValue="51" StringValue="6,144.0 Mbps CPRI"/>
+                <LookupValue NumericValue="52" StringValue="9,830.4 Mbps CPRI"/>
+                <LookupValue NumericValue="53" StringValue="10,137.6 Mbps CPRI"/>
+                <LookupValue NumericValue="54" StringValue="12,165.12 Mbps CPRI"/>
+            </LookupValues>
+        </AttributeInfo>
         <AttributeInfo Name="Port Speed" Type="String" DefaultValue="NA" IsReadOnly="true" IsCommand="true">
             <Tags>
                 <TagName Name="Setting"/>
@@ -385,6 +424,33 @@
                                 <AllowedValue>1</AllowedValue>
                                 <AllowedValue>2</AllowedValue>
                                 <AllowedValue>10</AllowedValue>
+                            </AllowedValues>
+                        </AttachedAttribute>
+                        <AttachedAttribute Name="Speed" IsOverridable="true" IsLocal="false">
+                            <AllowedValues>
+                                <AllowedValue>1</AllowedValue>
+                                <AllowedValue>4</AllowedValue>
+                                <AllowedValue>5</AllowedValue>
+                                <AllowedValue>6</AllowedValue>
+                                <AllowedValue>11</AllowedValue>
+                                <AllowedValue>12</AllowedValue>
+                                <AllowedValue>13</AllowedValue>
+                                <AllowedValue>14</AllowedValue>
+                                <AllowedValue>21</AllowedValue>
+                                <AllowedValue>22</AllowedValue>
+                                <AllowedValue>42</AllowedValue>
+                                <AllowedValue>43</AllowedValue>
+                                <AllowedValue>44</AllowedValue>
+                                <AllowedValue>45</AllowedValue>
+                                <AllowedValue>46</AllowedValue>
+                                <AllowedValue>47</AllowedValue>
+                                <AllowedValue>48</AllowedValue>
+                                <AllowedValue>49</AllowedValue>
+                                <AllowedValue>50</AllowedValue>
+                                <AllowedValue>51</AllowedValue>
+                                <AllowedValue>52</AllowedValue>
+                                <AllowedValue>53</AllowedValue>
+                                <AllowedValue>54</AllowedValue>
                             </AllowedValues>
                         </AttachedAttribute>
                         <AttachedAttribute Name="Protocol Value" IsOverridable="true" IsLocal="false">

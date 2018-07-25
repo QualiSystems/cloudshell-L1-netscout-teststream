@@ -21,7 +21,6 @@ GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Conn Type  GEO addr  Name (>20 .
 01.07.18  24.30 01.07.18           Not Present  Duplex     01.06.18  24.30 01.06.18           Not Present  10000    Ethernet
 01.07.19  24.30 01.07.19           Not Present  Duplex     01.06.19  24.30 01.06.19           Not Present  10000    Ethernet
 01.07.20  24.30 01.07.20           Not Present  Duplex     01.06.20  24.30 01.06.20           Not Present  10000    Ethernet
-21.02.93  25.28 01.02.93           Not Present  Duplex     01.07.89  24.30 01.07.89           Not Present  10000    Ethernet
 01.01.17  24.30 01.01.17.01        Not Present  Unknown    01.01.21  24.30 01.01.21.02        Not Present  40000    Ethernet
 01.01.25  24.30 01.01.25           Not Present  Duplex     01.01.03  24.30 01.01.03           Not Present  40G/10G  Ethernet
 01.11.01  24.30 01.11.01           -1.718559    Duplex     01.12.01  24.30 01.12.01           -30.457575   10000    Ethernet

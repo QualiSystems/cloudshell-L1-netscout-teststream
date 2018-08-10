@@ -31,10 +31,11 @@ class TestCliService(CliService):
                      **kwargs):
         self._logger.debug(command)
         file_name = re.sub('\*', 'asterisk', command)
-        file_name = re.sub('\s', '_', file_name) + '.txt'
+        file_name = re.sub('\s', '_', file_name)
+        file_name = re.sub('\"', '', file_name)
 
         try:
-            with open(os.path.join(self._data_path, file_name), 'r') as f:
+            with open(os.path.join(self._data_path, file_name + '.txt'), 'r') as f:
                 output = f.read()
             return output
         except IOError:

@@ -34,10 +34,10 @@ class DriverCommands(DriverCommandsInterface):
         """
         self._logger = logger
         self._driver_port_mode = driver_port_mode
-        self._cli_handler = NetscoutCliHandler(logger)
-        # self._cli_handler = CLISimulator(
-        #     os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cli', 'simulator', 'data'),
-        #     logger)
+        # self._cli_handler = NetscoutCliHandler(logger)
+        self._cli_handler = CLISimulator(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cli', 'simulator', 'data'),
+            logger)
         self._switch_name = None
         self.__software_version = None
 

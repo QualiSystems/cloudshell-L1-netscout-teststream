@@ -68,11 +68,16 @@ class AutoloadActions(object):
         return chassis_table
 
     def _parse_blade_data(self, blades_data):
-        blades_id_type = re.findall(r'pim:\s+(\d+)\s+([\w-]+)', blades_data, flags=re.IGNORECASE)
-
+        # blades_id_type = re.findall(r'pim:\s+(\d+)\s+([\w-]+)', blades_data, flags=re.IGNORECASE)
+        #
         blade_dict = {}
-        for blade_id, blade_type in blades_id_type:
-            blade_dict[int(blade_id)] = blade_type
+        # for blade_id, blade_type in blades_id_type:
+        for line in blades_data.splitlines():
+            match = re.match(r'^\s*pim:\s+(\d+)\s+(.+)\s*$', line, re.IGNORECASE)
+            if match:
+                blade_id = match.group(1).strip()
+                blade_type = match.group(2).strip()
+                blade_dict[int(blade_id)] = blade_type
         return blade_dict
 
     def port_table(self):

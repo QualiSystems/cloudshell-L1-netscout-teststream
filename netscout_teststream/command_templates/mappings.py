@@ -9,7 +9,7 @@ ERROR_MAP = OrderedDict([("[Nn]ot compatible", "Ports\Subports not compatible"),
                          ("[Ii]ncorrect", "Incorrect port number format")])
 ERROR_MAP.update(GENERIC_ERRORS)
 
-SELECT_SWITCH = CommandTemplate('select switch {switch_name}', ACTION_MAP, ERROR_MAP)
+SELECT_SWITCH = CommandTemplate('select switch "{switch_name}"', ACTION_MAP, ERROR_MAP)
 MAP_SIMPLEX_OLD = CommandTemplate('connect simplex prtnum {src_port} to {dst_port} force', ACTION_MAP, ERROR_MAP)
 MAP_SIMPLEX_NEW = CommandTemplate('CONNECT -s -F PRTNUM {src_port} PRTNUM {dst_port}', ACTION_MAP, ERROR_MAP)
 MAP_DUPLEX_OLD = CommandTemplate('connect duplex prtnum {src_port} to {dst_port} force', ACTION_MAP, ERROR_MAP)

@@ -27,13 +27,14 @@ class DriverCommands(DriverCommandsInterface):
     SUFFIX_SEPARATOR = '-'
     CHASSIS_ID = 1
 
-    def __init__(self, logger, driver_port_mode=LOGICAL_PORT_MODE):
+    def __init__(self, logger, runtime_config):
         """
-        :param logger:
         :type logger: logging.Logger
+        :type runtime_config: cloudshell.layer_one.core.helper.runtime_configuration.RuntimeConfiguration
         """
         self._logger = logger
-        self._driver_port_mode = driver_port_mode
+        self._runtime_config = runtime_config
+        self._driver_port_mode = runtime_config.read_key('DRIVER.PORT_MODE', None)
         # self._cli_handler = NetscoutCliHandler(logger)
         self._cli_handler = CLISimulator(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), 'cli', 'simulator', 'data'),

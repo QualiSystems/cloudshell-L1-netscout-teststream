@@ -1,0 +1,16 @@
+INFORMATION ON 3903X_24.22:
+
+*** PHYSICAL INFORMATION ***
+Switch Model: 3903
+IP Address:   172.23.24.22
+
+
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+
+  PIM: 01  T-Blade
+    T-Blade       UBoot 9      0234 F0::T0318767010004   04.05.200.116
+  PIM: 02  S-Blade
+    S-Blade       UBoot 4      0234 E1:: 031408010019   04.05.200.116
+  PIM: 03  T100L-Blade
+    T100L-Blade   UBoot 106    0234 E5::TSB150288001    04.05.200.116

@@ -1,0 +1,35 @@
+INFORMATION ON 3912_Kaiser:
+
+*** PHYSICAL INFORMATION ***
+Switch Model: 3912
+IP Address:   10.233.30.200
+
+
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+
+  PIM: 01  T-Blade
+    T-BLADE       UBoot 9      0234 F0:: TSB150688008   04.01.200.014
+  PIM: 02  T-Blade
+    T-BLADE       UBoot 9      0234 F0:: TSB150688009   04.01.200.014
+  PIM: 03  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: 031843010011   04.01.200.014
+  PIM: 04  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: 031843010007   04.01.200.014
+  PIM: 05  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: 031818010126   04.01.200.014
+  PIM: 06  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: 0318161010004   04.01.200.014
+  PIM: 07  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: 031843010005   04.01.200.014
+  PIM: 08  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: 0318161010005   04.01.200.014
+  PIM: 09  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: PSB160388068   04.01.200.014
+  PIM: 10  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: PSB160488024   04.01.200.014
+  PIM: 11  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: PSB160488022   04.01.200.014
+  PIM: 12  S-Blade
+    S-BLADE       UBoot 4      0234 E1:: PSB160488017   04.01.200.014
+

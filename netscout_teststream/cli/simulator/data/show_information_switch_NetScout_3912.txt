@@ -1,0 +1,27 @@
+
+*** PHYSICAL INFORMATION ***
+Switch Model: 3912
+IP Address:   10.35.143.166
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+  PIM: 01  T-Blade
+    T-Blade       UBoot 9      0234 F0:: TSB170888017   04.02.200.053
+  PIM: 03  S-Blade Pro
+    S-Blade Pro   UBoot 106    3.10. E2::TSP170388008    04.02.200.053
+  PIM: 04  S-Blade Pro
+    S-Blade Pro   UBoot 106    3.10. E2::TSP170388010    04.02.200.053
+  PIM: 05  S-Blade
+
+  PIM: 06  S-Blade
+
+  PIM: 07  S-Blade
+
+  PIM: 08  S-Blade
+    S-Blade       UBoot 4      0234 E1:: PSB170688028   04.02.200.053
+  PIM: 09  S-Blade
+    S-Blade       UBoot 4      0234 E1:: TSB161288019   04.02.200.053
+  PIM: 10  S-Blade
+    S-Blade       UBoot 4      0234 E1:: TSB161288018   04.02.200.053
+  PIM: 11  S-Blade
+    S-Blade       UBoot 4      0234 E1:: TSB161288017   04.02.200.053
+

@@ -52,4 +52,4 @@ class Main(object):
 
 
 if __name__ == '__main__':
-    Main(*sys.argv).run_driver('netscout-teststream')
+    Main(*sys.argv).run_driver('netscout_teststream')

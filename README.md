@@ -5,7 +5,7 @@
 
 Release date: 04/12/2018 
 
-Shell version: 4.0.4
+Shell version: 5.0.1
 
 Document version: 1.0
 
@@ -57,8 +57,15 @@ The L1 switch families and models are listed in the following table:
 |Family|Model|Description|
 |:---|:---|:---|
 |L1 Switch|Netscout Teststream Chassis|L1 Switch Chassis|
-|L1 Switch Blade|Generic L1 Module|Generic L1 Module|
-|L1 Switch Port|Generic L1 Port|Generic L1 Port|
+|L1 Switch Blade|O-Blade|Netscout O-Blade|
+|L1 Switch Blade|S-Blade|Netscout S-Blade|
+|L1 Switch Blade|S-Blade-Pro|Netscout S-Blade-Pro|
+|L1 Switch Blade|T-Blade|Netscout T-Blade|
+|L1 Switch Blade|T100-Blade|Netscout T100-Blade|
+|L1 Switch Blade|T100L-Blade|Netscout T100L-Blade|
+|L1 Switch Blade|Hs-Bank|Netscout Hs-Bank|
+|L1 Switch Blade|P-Blade|Netscout P-Blade|
+|L1 Switch Port|Netscout Generic L1 Port|Netscout L1 Port|
 
 #### **Netscout Teststream Attributes**
 
@@ -70,14 +77,12 @@ The Netscout Teststream Chassis attribute names and types are listed in the foll
 |Serial Number|String|Serial number|
 |OS Version|String|OS version|
 
-The Generic L1 Module attribute names and types are listed in the following table:
+O-Blade, S-Blade, S-Blade-Pro, T-Blade, T100-Blade, T100L-Blade, Hs-Bank, P-Blade attribute names and types are listed in the following table:
 
 |Attribute|Type|Description|
 |:---|:---|:---|
-|Model Name|String|Model name|
-|Serial Number|String|Serial number|
 
-The Generic L1 Port attribute names and types are listed in the following table:
+The Netscout Generic L1 Port attribute names and types are listed in the following table:
 
 |Attribute|Type|Default|Description|
 |:---|:---|:---|:---|
@@ -85,8 +90,10 @@ The Generic L1 Port attribute names and types are listed in the following table:
 |Duplex|Lookup|Full|Port Duplex|
 |Port Speed|String||Port speed|
 |Protocol|Lookup|Transparent|Port protocol|
+|Protocol Type|Lookup |Transparent|Port protocol type|
 |Protocol Type Value|String ||Port protocol type value|
 |Protocol Value|String ||Port protocol value|
+|Speed|Lookup|10 Mbps|Port speed|
 |Rx Power (dBm)|String|0|Optical Port RX signal strength|
 |Tx Power (dBm)|String|0|Optical Port TX signal strength|
 |Wavelength|String|0|Optical Port Wavelength|

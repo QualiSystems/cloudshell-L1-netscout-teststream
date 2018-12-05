@@ -389,7 +389,7 @@
             <AttachedAttributes/>
             <AttributeValues/>
             <Models>
-                <ResourceModel Name="Netscout Generic L1 Port" SupportsConcurrentCommands="false">
+                    <ResourceModel Name="Netscout Generic L1 Port" SupportsConcurrentCommands="false">
                     <AttachedAttributes>
                         <AttachedAttribute Name="Protocol" IsOverridable="true" IsLocal="false">
                             <AllowedValues>

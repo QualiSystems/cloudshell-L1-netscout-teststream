@@ -137,7 +137,11 @@ This section describes how to import the **Netscout TestStream L1 Shell** and co
   2. Extract the *Netscout TestStream shell zip* package to the following location on the Quali Server machine: 
   *C:\Program Files (x86)\QualiSystems\CloudShell\Server\Drivers*
   
-  3. Run the *C:\Program Files (x86)\QualiSystems\CloudShell\Server\Drivers\cloudshell-L1-netscout_teststream\install_driver.bat* file.
+  3. Make sure the *NetScout_Horizon.exe* file is unblocked.
+      1. Right-click the file and select **Properties**.
+      2. If you see an **Unblock** option, select it and click **OK**.
+	 
+  5. Run the *C:\Program Files (x86)\QualiSystems\CloudShell\Server\Drivers\cloudshell-L1-netscout_teststream\install_driver.bat* file.
   
   4. Import the new data model.
       1. In **Resource Manager Client>Admin**, right-click **Resource Families** and select **Import**.

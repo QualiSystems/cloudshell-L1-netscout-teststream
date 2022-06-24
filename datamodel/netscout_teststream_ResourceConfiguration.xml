@@ -339,6 +339,14 @@
                     </ParentModels>
                     <Drivers/>
                 </ResourceModel>
+                <ResourceModel Name="S-Blade 64" Description="" SupportsConcurrentCommands="false">
+                    <AttachedAttributes/>
+                    <AttributeValues/>
+                    <ParentModels>
+                        <ParentModelName>Netscout Teststream Chassis</ParentModelName>
+                    </ParentModels>
+                    <Drivers/>
+                </ResourceModel>
                 <ResourceModel Name="T-Blade" Description="" SupportsConcurrentCommands="false">
                     <AttachedAttributes/>
                     <AttributeValues/>
@@ -486,6 +494,7 @@
                         <ParentModelName>O-Blade</ParentModelName>
                         <ParentModelName>S-Blade</ParentModelName>
                         <ParentModelName>S-Blade-Pro</ParentModelName>
+                        <ParentModelName>S-Blade 64</ParentModelName>
                         <ParentModelName>T-Blade</ParentModelName>
                         <ParentModelName>T100-Blade</ParentModelName>
                         <ParentModelName>T100L-Blade</ParentModelName>

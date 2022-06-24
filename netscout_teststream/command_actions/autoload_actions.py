@@ -87,6 +87,7 @@ class AutoloadActions(object):
         for line in output.strip().splitlines():
             address, protocol_id, port_mode, connected, connected_dir, subport_tx, subport_rx, alarm, name = line.strip(
             ).split(',')
+            # Checking if port configured in XSG port mode, which is exclusively reserved for Nescout internal cross-connect.
             if int(port_mode) != 16:
                 port_table[address] = PortInfoDTO(name.strip("'"), address, protocol_id)
         return port_table

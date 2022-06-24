@@ -1,0 +1,15 @@
+INFORMATION ON 3903:
+
+*** PHYSICAL INFORMATION ***
+Switch Model: 3903
+IP Address:   10.233.31.54
+
+
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+
+  PIM: 01  T-Blade
+    T-BLADE       UBoot 9      0234 F0::TSB150488051    04.01.200.014
+  PIM: 02  T-Blade
+    T-BLADE       UBoot 9      0234 F0:: TSB150688013   04.01.200.014
+

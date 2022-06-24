@@ -1,0 +1,8 @@
+Switch: 3200X_26.27 [ 5 ]
+
+GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Conn Type  GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Speed    Protocol
+--------  -----------------------  -----------  ---------  --------  -----------------------  -----------  -------  --------
+01.01.09  26.27 01.01.03-1         Not Present  Duplex     01.01.13  26.27 01.01.04-1         Not Present  100000   Unknown
+01.01.09  26.27 01.01.03-1         Not Present  Test       01.01.17  26.27 01.01.05-1         Not Present  100000   Unknown
+
+

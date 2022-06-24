@@ -1,0 +1,9 @@
+
+Switch: NetScout 3912 [ 2 ]
+GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Conn Type  GEO addr  Name (>20 ..)            Rx Pwr(dBm)  Speed    Protocol
+--------  -----------------------  -----------  ---------  --------  -----------------------  -----------  -------  --------
+01.03.01  01 01.03.01              Not Present  Duplex     01.04.01  01 01.04.01              Not Present  40000    Ethernet
+01.09.31  01 01.09.31              Not Present  Duplex     01.09.36  01 01.09.36              Not Present  CU1000   Ethernet
+01.09.32  01 01.09.32              Not Present  Duplex     01.09.40  01 01.09.40              Not Present  CU1000   Ethernet
+01.01.35  01 01.01.35              Not Present  Duplex     01.01.39  01 01.01.39              Not Present  10000    Ethernet
+

@@ -1,0 +1,15 @@
+INFORMATION ON OS192_103:
+
+*** PHYSICAL INFORMATION ***
+Switch Model: OS-192
+IP Address:   10.88.37.103
+
+
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+
+  PIM: 01  O-Blade
+    Netscout,N-OST-192x192-LU1-DSHNV-017,002020,6.3.3.16
+  PIM: 02  O-Blade
+    Netscout,N-OST-192x192-LU1-DSHNV-017,002020,6.3.3.16
+

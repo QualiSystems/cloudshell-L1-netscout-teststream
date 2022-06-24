@@ -85,9 +85,10 @@ class AutoloadActions(object):
                                          remove_prompt=True).execute_command(switch_name=self._switch_name)
         port_table = {}
         for line in output.strip().splitlines():
-            address, protocol_id, normal, connected, connected_dir, subport_tx, subport_rx, alarm, name = line.strip(
+            address, protocol_id, port_mode, connected, connected_dir, subport_tx, subport_rx, alarm, name = line.strip(
             ).split(',')
-            port_table[address] = PortInfoDTO(name.strip("'"), address, protocol_id)
+            if int(port_mode) != 16:
+                port_table[address] = PortInfoDTO(name.strip("'"), address, protocol_id)
         return port_table
 
     def mapping_table(self):

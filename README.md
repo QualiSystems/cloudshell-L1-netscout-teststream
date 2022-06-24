@@ -60,6 +60,7 @@ The L1 switch families and models are listed in the following table:
 |L1 Switch Blade|O-Blade|Netscout O-Blade|
 |L1 Switch Blade|S-Blade|Netscout S-Blade|
 |L1 Switch Blade|S-Blade-Pro|Netscout S-Blade-Pro|
+|L1 Switch Blade|S-Blade 64|Netscout S-Blade 64|
 |L1 Switch Blade|T-Blade|Netscout T-Blade|
 |L1 Switch Blade|T100-Blade|Netscout T100-Blade|
 |L1 Switch Blade|T100L-Blade|Netscout T100L-Blade|

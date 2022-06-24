@@ -139,24 +139,30 @@ This section describes how to import the **Netscout TestStream L1 Shell** and co
   
   3. Run the *C:\Program Files (x86)\QualiSystems\CloudShell\Server\Drivers\cloudshell-L1-netscout_teststream\install_driver.bat* file.
   
-  4. Import the new data model.
+  4. Navigate to *C:\Program Files (x86)\QualiSystems\CloudShell\Server\Drivers*
+  5. Make sure the *NetScout_Horizon.exe* file is unblocked.
+      1. Right-click the file and select **Properties**.
+      2. If you see an **Unblock** option, select it and click **OK**.
+  
+  6. Import the new data model.
       1. In **Resource Manager Client>Admin**, right-click **Resource Families** and select **Import**.
       2. Select the *C:\Program Files (x86)\QualiSystems\CloudShell\Server\Drivers\cloudshell-L1-netscout_teststream\datamodel\netscout_teststream_ResourceConfiguration.xml* file.
       3. Click **Open**.
 	
-  5. Create an L1 resource.
+  7. Create an L1 resource.
       1. In **Resource Explorer**, right-click **Root** and select **New>Resource**.
-      2. Enter the **Name** and **Address**.
-      3. Select the **L1 Switch** family.
-      4. Ensure that the correct **Model** Netscout TestStream Chassis and **Driver** NETSCOUT TESTSTREAM are selected.
-      5. Click **OK**.
+      2. Enter the **Name** 
+      3. Enter **Address** in the format `<ip address or hostname>:<port>?teststream=<switch name>`.
+      4. Select the **L1 Switch** family.
+      5. Ensure that the correct **Model** Netscout TestStream Chassis and **Driver** NETSCOUT TESTSTREAM are selected.
+      6. Click **OK**.
 	
-  6. Auto Load the new resource.
+  8. Auto Load the new resource.
       1. In **Resource Explorer**, right-click the new resource and select **Configuration**.
       2. In the **Internal Resources** pane, right-click the switch and select **Exclude**. 
       3. Click the **Auto Load** button at the bottom of the **Configuration** tab.
 	
-  7. Define the resource connections on the L1 switch.
+  9. Define the resource connections on the L1 switch.
       1. Right-click the resource and select **Configuration>Connections**.
       2. Connect a resource's port to a different port in the switch resource by clicking each port's **Connected To** button, selecting the resource's **Family** and **Resource**, and selecting the port to connect.
       3. Click **OK** in the **Resource connection** dialog box.

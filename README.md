@@ -3,9 +3,9 @@
 
 # **Netscout TestStream L1 Shell**
 
-Release date: 04/12/2018 
+Release date: 06/24/2022 
 
-Shell version: 5.0.1
+Shell version: 5.0.2
 
 Document version: 1.0
 

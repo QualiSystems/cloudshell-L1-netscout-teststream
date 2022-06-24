@@ -8,6 +8,7 @@ class NetscoutBlade(Blade):
         r'^o[-_\s]blade$': 'O-Blade',
         r'^s[-_\s]blade$': 'S-Blade',
         r'^s[-_\s]blade[-_\s]pro$': 'S-Blade-Pro',
+        r'^s[-_\s]blade\s64$': 'S-Blade 64',
         r'^t[-_\s]blade$': 'T-Blade',
         r'^t100[-_\s]blade$': 'T100-Blade',
         r'^t100l[-_\s]blade$': 'T100L-Blade',

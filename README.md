@@ -153,7 +153,8 @@ This section describes how to import the **Netscout TestStream L1 Shell** and co
   7. Create an L1 resource.
       1. In **Resource Explorer**, right-click **Root** and select **New>Resource**.
       2. Enter the **Name** 
-      3. Enter **Address** in the format `<ip address or hostname>:<port>?teststream="<switch name>"`.
+      3. Enter **Address** in the format `<ip address or hostname>:<port>?teststream=<switch name>`.
+      Note: **Address** is **Netscout Controller** address.
       4. Select the **L1 Switch** family.
       5. Ensure that the correct **Model** Netscout TestStream Chassis and **Driver** NETSCOUT TESTSTREAM are selected.
       6. Click **OK**.

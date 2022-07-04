@@ -1,0 +1,17 @@
+INFORMATION ON 3903X_25.28:
+
+*** PHYSICAL INFORMATION ***
+Switch Model: 3903
+IP Address:   172.23.25.28
+
+
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+
+  PIM: 01  S-Blade Pro
+    S-Blade Pro   UBoot 106    3.10. E2::PSB160488047    04.06.200.006
+  PIM: 02  S-Blade Pro
+    S-Blade Pro   UBoot 106    3.10. E2::PSB160688002    04.06.200.006
+  PIM: 03  S-Blade Pro
+    S-Blade Pro   UBoot 106    3.10. E2::PSB160688010    04.06.200.006
+

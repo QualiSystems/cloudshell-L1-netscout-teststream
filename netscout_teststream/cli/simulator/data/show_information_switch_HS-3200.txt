@@ -1,0 +1,12 @@
+INFORMATION ON HS-3200:
+
+*** PHYSICAL INFORMATION ***
+Switch Model: HS-3200
+IP Address:   172.23.24.176
+
+
+*** SWITCH COMPONENTS ***
+Chassis Controller 1:
+
+  PIM: 01  HS-Bank
+    HS-Bank 32x100G, 64x50G, 32x40G, 64x25G, 64x10G    04.05.200.116

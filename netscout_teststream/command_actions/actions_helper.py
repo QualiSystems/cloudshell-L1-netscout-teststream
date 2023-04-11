@@ -29,7 +29,7 @@ def parse_table(
     """
     res = []
     match = re.search(
-        r"(?P<header_border>({sep}{hbs}{{2,}})+)\s+(?P<info>.*)".format(
+        r"(?P<header_border>({hbs}{{2,}}({sep})*)+)\s+(?P<info>.*)".format(
             hbs=header_border_separator,
             sep=separator
         ),
@@ -38,6 +38,9 @@ def parse_table(
     )
     if match:
         border_list = map(len, match.group("header_border").strip().split())
+
+        if len(border_list) != len(header_column_names):
+            raise Exception("Parsing error")
 
         for line in match.group("info").splitlines():
             line = line.strip()

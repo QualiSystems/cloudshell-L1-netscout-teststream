@@ -40,7 +40,7 @@ def parse_table(
         border_list = map(len, match.group("header_border").strip().split())
 
         if len(border_list) != len(header_column_names):
-            raise Exception("Parsing error")
+            raise Exception("Parsing table error")
 
         for line in match.group("info").splitlines():
             line = line.strip()
@@ -49,7 +49,13 @@ def parse_table(
             data = {}
             for i, name in enumerate(header_column_names):
                 info_len = border_list[i]
-                data.update({name: line[:info_len].strip()})
+
+                temp = line[:info_len].strip()
+                while len(line) > info_len and line[info_len] != " ":
+                    temp += line[info_len]
+                    info_len += 1
+
+                data.update({name: temp})
                 line = line[info_len + len(separator):]
 
             if data:

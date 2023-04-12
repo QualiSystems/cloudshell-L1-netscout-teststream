@@ -14,8 +14,11 @@ MAP_SIMPLEX_OLD = CommandTemplate('connect simplex prtnum {src_port} to {dst_por
 MAP_SIMPLEX_NEW = CommandTemplate('CONNECT -s -F PRTNUM {src_port} PRTNUM {dst_port}', ACTION_MAP, ERROR_MAP)
 MAP_DUPLEX_OLD = CommandTemplate('connect duplex prtnum {src_port} to {dst_port} force', ACTION_MAP, ERROR_MAP)
 MAP_DUPLEX_NEW = CommandTemplate('CONNECT -d -F PRTNUM {src_port} PRTNUM {dst_port}', ACTION_MAP, ERROR_MAP)
-SHOW_CONNECTION = CommandTemplate('show conn prtnum {port}', ACTION_MAP, OrderedDict(
-    [("[Ee]rror|ERROR", "Error during command execution. See logs for more details")]))
+SHOW_CONNECTION = CommandTemplate(
+    'show conn prtnum {port}',
+    ACTION_MAP,
+    OrderedDict([("[^[Rr]ead]\s*[Ee]rror|ERROR", "Error during command execution. See logs for more details")])
+)
 DISCONNECT_SIMPLEX_NEW = CommandTemplate('DISCONNECT -s -F PRTNUM {src_port} PRTNUM {dst_port}', ACTION_MAP,
                                          OrderedDict(ERROR_MAP.items() + [
                                              ("[Nn]ot [Ss]implex", "Subport is not simplex connected")]))

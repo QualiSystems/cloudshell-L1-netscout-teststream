@@ -1,11 +1,12 @@
 import os
 import re
 
-from cloudshell.cli.cli_service import CliService
+from cloudshell.cli.service.cli_service import CliService
+
 from netscout_teststream.cli.l1_cli_handler import L1CliHandler
 
 
-class TestCliContextManager(object):
+class TestCliContextManager:
     def __init__(self, test_cli):
         self._test_cli = test_cli
 
@@ -27,23 +28,32 @@ class TestCliService(CliService):
     def enter_mode(self, command_mode):
         pass
 
-    def send_command(self, command, expected_string=None, action_map=None, error_map=None, logger=None, *args,
-                     **kwargs):
+    def send_command(
+        self,
+        command,
+        expected_string=None,
+        action_map=None,
+        error_map=None,
+        logger=None,
+        *args,
+        **kwargs
+    ):
         self._logger.debug(command)
-        file_name = re.sub('\*', 'asterisk', command)
-        file_name = re.sub('\s', '_', file_name)
-        file_name = re.sub('\"', '', file_name)
+        file_name = re.sub(r"\*", "asterisk", command)
+        file_name = re.sub(r"\s", "_", file_name)
+        file_name = re.sub('"', "", file_name)
 
         try:
-            with open(os.path.join(self._data_path, file_name + '.txt'), 'r') as f:
+            with open(os.path.join(self._data_path, file_name + ".txt")) as f:
                 output = f.read()
             return output
-        except IOError:
+        except OSError:
             pass
 
 
 class CLISimulator(L1CliHandler):
     def __init__(self, data_path, logger):
+        super().__init__()
         self._cli_service = TestCliContextManager(TestCliService(data_path, logger))
 
     def get_cli_service(self, command_mode):

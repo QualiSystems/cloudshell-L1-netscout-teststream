@@ -1,12 +1,14 @@
+from __future__ import annotations
+
 import re
 
 
 def parse_table(
-        parsable_str,
-        header_column_names,
-        header_border_separator="-",
-        separator="  ",
-):
+    parsable_str: str,
+    header_column_names: list[str],
+    header_border_separator: str = "-",
+    separator: str = "  ",
+) -> list[dict]:
     """Parse formatted table.
 
     :param parsable_str: list of column names
@@ -26,18 +28,17 @@ def parse_table(
     01.01.09  02 01.01.03-1 - 10G  ..  Not Present  Duplex     01.01.11  02 01.01.03-3 - 10G  ..  Not Present  10000    Ethernet
     01.05.23  03 01.05.23              -2.800889    Duplex     01.03.05  03 01.03.05 - 10G To ..  Not Present  10000    Ethernet
 
-    """
+    """  # noqa: E501
     res = []
     match = re.search(
         r"(?P<header_border>({hbs}{{2,}}({sep})*)+)\s+(?P<info>.*)".format(
-            hbs=header_border_separator,
-            sep=separator
+            hbs=header_border_separator, sep=separator
         ),
         parsable_str,
-        re.DOTALL
+        re.DOTALL,
     )
     if match:
-        border_list = map(len, match.group("header_border").strip().split())
+        border_list = list(map(len, match.group("header_border").strip().split()))
 
         if len(border_list) != len(header_column_names):
             raise Exception("Parsing table error")
@@ -56,7 +57,7 @@ def parse_table(
                     info_len += 1
 
                 data.update({name: temp})
-                line = line[info_len + len(separator):]
+                line = line[info_len + len(separator) :]
 
             if data:
                 res.append(data)

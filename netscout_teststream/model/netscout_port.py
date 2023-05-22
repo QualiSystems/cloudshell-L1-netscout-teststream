@@ -1,11 +1,12 @@
-from cloudshell.layer_one.core.response.resource_info.entities.attributes import StringAttribute, NumericAttribute
+from cloudshell.layer_one.core.response.resource_info.entities.attributes import (
+    NumericAttribute,
+)
 from cloudshell.layer_one.core.response.resource_info.entities.port import Port
 
 
 class NetscoutPort(Port):
-    """
-    Netscout Port
-    """
+    """Netscout Port."""
+
     """Netscout id:(Protocol LV, Protocol Type LV, Speed LV)"""
     PROTOCOL_ASSOCIATION_TABLE = {
         # SONET
@@ -36,14 +37,14 @@ class NetscoutPort(Port):
         108: (76, 10, 48),  # CPRI3 (2,457.6 mbps)
         109: (75, 10, 47),  # CPRI2 (1,228.8 mbps)
         110: (74, 10, 46),  # CPRI1 (614.4 mbps)
-
     }
-    MODEL_NAME = 'Netscout Generic L1 Port'
+    MODEL_NAME = "Netscout Generic L1 Port"
 
     def __init__(self, resource_id, port_model_name=None, netscout_protocol_id=0):
-        super(NetscoutPort, self).__init__(resource_id)
-        protocol_id, protocol_type_id, speed_id = self.PROTOCOL_ASSOCIATION_TABLE.get(int(netscout_protocol_id),
-                                                                                      (2, 0, 1))
+        super().__init__(resource_id)
+        protocol_id, protocol_type_id, speed_id = self.PROTOCOL_ASSOCIATION_TABLE.get(
+            int(netscout_protocol_id), (2, 0, 1)
+        )
         self.set_protocol(protocol_id)
         self.set_protocol_type(protocol_type_id)
         self.set_speed(speed_id)
@@ -52,12 +53,12 @@ class NetscoutPort(Port):
 
     def set_protocol(self, value):
         if value is not None:
-            self.attributes.append(NumericAttribute('Protocol', value))
+            self.attributes.append(NumericAttribute("Protocol", value))
 
     def set_protocol_type(self, value):
         if value is not None:
-            self.attributes.append(NumericAttribute('Protocol Type', value))
+            self.attributes.append(NumericAttribute("Protocol Type", value))
 
     def set_speed(self, value):
         if value is not None:
-            self.attributes.append(NumericAttribute('Speed', value))
+            self.attributes.append(NumericAttribute("Speed", value))

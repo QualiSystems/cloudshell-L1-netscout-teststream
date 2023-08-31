@@ -117,7 +117,7 @@ class DriverCommands(DriverCommandsInterface):
     def _convert_port_address(self, port_address: str) -> str:
         ip_addr, blade_id, port_id = port_address.split("/")
         port_id = port_id.split(self.SUFFIX_SEPARATOR)[0]
-        return f"{str(self.CHASSIS_ID).zfill(2)}.{blade_id.zfill(2)}.{port_id.zfill(3)}"
+        return f"{str(self.CHASSIS_ID).zfill(2)}.{blade_id.zfill(2)}.{port_id.zfill(2)}"
 
     def map_bidi(self, src_port: str, dst_port: str):
         """Create a bidirectional connection between source and destination ports."""
